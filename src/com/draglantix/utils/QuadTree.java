@@ -11,7 +11,7 @@ import com.draglantix.main.Assets;
 
 public class QuadTree {
 
-	private List<Vector2f> points = new ArrayList<Vector2f>();
+	private List<AABB> boxes = new ArrayList<Vector2f>();
 	
 	private Quad bound;
 	private int capacity;
