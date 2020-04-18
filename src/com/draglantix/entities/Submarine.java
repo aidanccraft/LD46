@@ -4,6 +4,7 @@ import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import com.draglantix.flare.window.Window;
+import com.draglantix.main.Assets;
 
 public class Submarine {
 	
@@ -38,10 +39,6 @@ public class Submarine {
 			this.velocity.add(0.0015f, 0);
 		}
 		
-		if(this.position.y > 0) {
-			this.position.y = 0;
-		}
-		
 		float speed = velocity.length();
 		Vector2f temp = new Vector2f(0, 0);
 		if(this.velocity.x != 0 || this.velocity.y != 0) {
@@ -49,6 +46,27 @@ public class Submarine {
 		}
 		this.velocity.sub(temp.mul((float) Math.pow(speed, 2) * resistiveForce));
 		this.position.add(this.velocity);
+		
+		boundPos();
+	}
+	
+	private void boundPos() {
+		if(position.x < 0) {
+			position.x = 0;
+			velocity.x = 0;
+		}
+		if(position.x > Assets.map.getWidth()-1) {
+			position.x = Assets.map.getWidth()-1;
+			velocity.x = 0;
+		}
+		if(position.y > 0) {
+			position.y = 0;
+			velocity.y = 0;
+		}
+		if(position.y < -Assets.map.getHeight()+1) {
+			position.y = -Assets.map.getHeight()+1;
+			velocity.y = 0;
+		}
 	}
 	
 	public float getDistance(String direction) {

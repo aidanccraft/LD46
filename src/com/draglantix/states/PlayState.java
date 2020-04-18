@@ -30,14 +30,14 @@ public class PlayState extends GameState {
 	}
 
 	public void init() {
-		sub = new Submarine(new Vector2f(0, 0), 0.05f);
+		sub = new Submarine(new Vector2f(50, -10), 0.05f);
 		states.put(0, "CAMERA DOWN");
 		states.put(1, "CAMERA UP");
 		states.put(2, "CAMERA LEFT");
 		states.put(3, "CAMERA RIGHT");
 		states.put(4, "SONAR");
 		
-		//Maybe use this for collision????
+		//Maybe use this for collision?
 		map = ImageDecoder.decode("res/textures/map.png");
 	}
 
@@ -113,11 +113,12 @@ public class PlayState extends GameState {
 
 	private void drawCamera() {
 		g.drawMode(g.DRAW_SCREEN);
-		g.drawImage(Assets.terrain, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-				new Color(255, 255, 255, sub.getDistance("UP")));
-		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-				new Color(255, 255, 255, sub.calculateLight()));
-		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawTerrain(Assets.terrain, Assets.map, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1), sub.getPosition());
+		System.out.println(sub.getPosition());
+//		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
+//				new Color(255, 255, 255, sub.getDistance("UP")));
+//		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
+//		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
+//				new Color(255, 255, 255, sub.calculateLight()));
 	}
 }
