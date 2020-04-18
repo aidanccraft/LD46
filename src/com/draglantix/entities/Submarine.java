@@ -3,8 +3,11 @@ package com.draglantix.entities;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
+import com.draglantix.flare.collision.AABB;
+import com.draglantix.flare.collision.AABBCollider;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
+import com.draglantix.states.PlayState;
 
 public class Submarine {
 	
@@ -13,10 +16,14 @@ public class Submarine {
 	
 	private boolean lights = false;
 	
+	private AABB bounds;
+	
 	public Submarine(Vector2f position, float resistiveForce) {
 		this.position = position;
 		this.velocity = new Vector2f(0, 0);
 		this.resistiveForce = resistiveForce;
+		this.bounds = new AABB(new Vector2f(position), new Vector2f(1), true);
+		PlayState.bounds.add(this.bounds);
 	}
 	
 	public void update() {
@@ -45,7 +52,25 @@ public class Submarine {
 			velocity.normalize(temp);
 		}
 		this.velocity.sub(temp.mul((float) Math.pow(speed, 2) * resistiveForce));
-		this.position.add(this.velocity);
+		
+		this.bounds.setCenter(this.position.add(this.velocity, new Vector2f()));
+		
+		for(AABB other : PlayState.bounds) {
+			if(!other.equals(this.bounds)) {
+				if(AABBCollider.collide(this.bounds, other)) {
+					Vector2f force = AABBCollider.correct(this.bounds, other);
+					this.bounds.getCenter().add(force);
+					if(Math.abs(force.x) > 0) {
+						this.velocity.x = 0;
+					}
+					if(Math.abs(force.y) > 0) {
+						this.velocity.y = 0;
+					}
+				}
+			}
+		}
+		
+		this.position = this.bounds.getCenter();
 		
 		boundPos();
 	}

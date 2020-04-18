@@ -1,17 +1,21 @@
 package com.draglantix.states;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import com.draglantix.entities.Submarine;
+import com.draglantix.flare.collision.AABB;
 import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
 import com.draglantix.utils.ImageDecoder;
+import com.draglantix.utils.QuadTree;
 
 public class PlayState extends GameState {
 
@@ -24,7 +28,11 @@ public class PlayState extends GameState {
 	
 	private Map<Integer, String> states = new HashMap<Integer, String>();
 	private int currentState = 0;
+	
+	public static List<AABB> bounds = new ArrayList<AABB>();
 
+	private QuadTree qt;
+	
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
 	}
@@ -37,8 +45,15 @@ public class PlayState extends GameState {
 		states.put(3, "CAMERA RIGHT");
 		states.put(4, "SONAR");
 		
-		//Maybe use this for collision?
 		map = ImageDecoder.decode("res/textures/map.png");
+		
+//		for(int x = 0; x < map.length; x++) {
+//			for(int y = 0; y < map[x].length; y++) {
+//				if(map[x][y])
+//					bounds.add(new AABB(new Vector2f(x, -y), new Vector2f(1), false));
+//			}
+//		}
+		
 	}
 
 	@Override
@@ -66,6 +81,10 @@ public class PlayState extends GameState {
 			drawSonar();
 		}
 		drawStats();
+		
+		for(AABB b : bounds) {
+			g.drawImage(Assets.debug, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
+		}
 	}
 	
 	private void handleSubstates() {
