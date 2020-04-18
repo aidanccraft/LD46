@@ -81,7 +81,7 @@ public class PlayState extends GameState {
 		PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
 
 		if (currentState == 4) {
-			List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 25 * (sonarScale / maxSonarScale));
+			List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 20 * (sonarScale / maxSonarScale));
 			for (AABB t : tmpsonar) {
 				if (!this.sonarBounds.contains(t)) {
 					this.sonarBounds.add(t);
@@ -144,8 +144,8 @@ public class PlayState extends GameState {
 				new Color(128, 160, 128, sonarLight));
 
 		for (AABB b : sonarBounds) {
-			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4),
-					b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
+			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(2),
+					b.getScale().mul(2, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
 		}
 	}
 
