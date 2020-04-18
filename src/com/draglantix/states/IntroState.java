@@ -13,11 +13,10 @@ public class IntroState extends GameState {
 	private float alpha = 0f;
 	private boolean fadeIn = true;
 	
-	private String message = "Deep in the Syidra forest, a wood fire burns low...";
+	private String message = "Can you survive the murky depths...";
 
 	public IntroState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
-	//	Assets.musicSource.play(Assets.darkloop);
 	}
 
 	@Override

@@ -1,12 +1,10 @@
 package com.draglantix.entities;
 
 import org.joml.Vector2f;
-import org.joml.Vector2i;
 
 import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.textures.Texture;
 import com.draglantix.flare.util.Color;
-import com.draglantix.utils.DragonMath;
 
 public abstract class Entity {
 	

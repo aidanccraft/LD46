@@ -1,15 +1,11 @@
 package com.draglantix.entities;
 
 import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 
 import com.draglantix.flare.textures.Animation;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
-import com.draglantix.states.States;
-import com.draglantix.utils.DragonMath;
-import com.draglantix.world.World;
 
 public class Player extends Dynamic{
 
