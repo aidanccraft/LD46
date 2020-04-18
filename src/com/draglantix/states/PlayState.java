@@ -1,5 +1,8 @@
 package com.draglantix.states;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -8,13 +11,19 @@ import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
+import com.draglantix.utils.ImageDecoder;
 
 public class PlayState extends GameState {
 
 	private Submarine sub;
 	
-	private float scale = 0;
-	private boolean radar = false;
+	private float sonarScale = 0;
+	private float maxSonarScale = 190;
+	
+	private boolean[][] map;
+	
+	private Map<Integer, String> states = new HashMap<Integer, String>();
+	private int currentState = 0;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
@@ -22,37 +31,84 @@ public class PlayState extends GameState {
 
 	public void init() {
 		sub = new Submarine(new Vector2f(0, 0), 0.05f);
+		states.put(0, "CAMERA DOWN");
+		states.put(1, "CAMERA UP");
+		states.put(2, "CAMERA LEFT");
+		states.put(3, "CAMERA RIGHT");
+		states.put(4, "SONAR");
+		
+		//Maybe use this for collision????
+		map = ImageDecoder.decode("res/textures/map.png");
 	}
 
 	@Override
 	public void tick() {
-		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_Q)) {
-			radar = !radar;
-			scale = 0;
+		handleSubstates();
+		
+		if(sonarScale == 0) {
+			Assets.submarineSFX.play(Assets.sonarPing);
 		}
 		
-		if(radar) {
-			if (scale >= 190) {
-				scale = 0;
-			} else {
-				scale += 1;
-			}
-		} else {
-			sub.update();
+		sonarScale ++;
+		if(sonarScale > maxSonarScale) {
+			sonarScale = 0;
 		}
+		
+		sub.update();
 	}
 
 	@Override
 	public void render() {
 		g.clearColor(new Color(255, 255, 255, 1));
-		if(radar) {
-			g.drawImage(Assets.radar.getTextureID(), new Vector2f(0, 0), new Vector2f(200), new Vector2f(0),
-					new Color(255, 255, 255, 1));
-			g.drawImage(Assets.radarScan.getTextureID(), new Vector2f(0, 0), new Vector2f(scale), new Vector2f(0),
-					new Color(255, 255, 255, 1));
-		} else {
-			drawCamera();
+		switch(currentState) {
+			case 0:
+				drawCamera();
+				break;
+			case 1:
+				drawCamera();
+				break;
+			case 2:
+				drawCamera();
+				break;
+			case 3:
+				drawCamera();
+				break;
+			case 4:
+				drawSonar();
+				break;
+			default:
+				break;
 		}
+		drawStats();
+	}
+	
+	private void handleSubstates() {
+		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
+			currentState ++;
+			if(currentState > states.size() - 1) {
+				currentState = 0;
+			}
+		}
+		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
+			currentState --;
+			if(currentState < 0) {
+				currentState = states.size() - 1;
+			}
+		}
+	}
+	
+	private void drawStats() {
+		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 72), new Vector2f(6),
+				new Color(255, 255, 255, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, "Depth: " + (int) sub.getDepth() + " m", new Vector2f(0, 64), new Vector2f(6),
+				new Color(255, 255, 255, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, "Lights: " + sub.isLights(), new Vector2f(0, 56), new Vector2f(6),
+				new Color(255, 255, 255, 1), g.FONT_CENTER);
+	}
+	
+	private void drawSonar() {
+		g.drawImage(Assets.sonarDot, new Vector2f(0, 0), new Vector2f(2), new Vector2f(0), new Color(128, 160, 128, 1));
+		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(sonarScale), new Vector2f(0),new Color(128, 160, 128, 1 - (sonarScale/maxSonarScale)));
 	}
 
 	private void drawCamera() {
@@ -63,10 +119,5 @@ public class PlayState extends GameState {
 		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.calculateLight()));
 		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
-
-		g.drawString(Assets.font, "Depth: " + (int) sub.getDepth() + " m", new Vector2f(0, 72), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, "Lights: " + sub.isLights(), new Vector2f(0, 64), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
 	}
 }
