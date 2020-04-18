@@ -23,6 +23,8 @@ public class Assets {
 	
 	public static Texture selector;
 	
+	public static Texture panel, screen;
+	
 	public static Texture sonarRing;
 	public static Texture sonarDot;
 	
@@ -56,6 +58,9 @@ public class Assets {
 		logoAnim = new Animation(3, 3, 64, 20, draglantix, 0, 9, false);
 		
 		selector = new Texture("textures/selector.png");
+		
+		panel = new Texture("textures/panel.png");
+		screen = new Texture("textures/screen.png");
 		
 		sonarRing = new Texture("textures/sonar/sonarring.png");
 		sonarDot = new Texture("textures/sonar/sonardot.png");

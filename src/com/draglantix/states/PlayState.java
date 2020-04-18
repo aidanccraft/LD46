@@ -23,7 +23,7 @@ public class PlayState extends GameState {
 	private Submarine sub;
 
 	private float sonarScale = 0;
-	private float maxSonarScale = 190;
+	private float maxSonarScale = 80;
 
 	private boolean[][] map;
 
@@ -93,7 +93,10 @@ public class PlayState extends GameState {
 
 	@Override
 	public void render() {
-		g.clearColor(new Color(255, 255, 255, 1));
+		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth(), Window.getHeight()), new Vector2f(0), new Color(100, 85, 76, 1));
+		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
+		
 		if (currentState < 4) {
 			drawCamera();
 		} else {
@@ -142,7 +145,7 @@ public class PlayState extends GameState {
 		
 		
 		for(AABB b : sonarBounds) {
-			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
+			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(2), b.getScale().mul(2, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
 		}
 	}
 
