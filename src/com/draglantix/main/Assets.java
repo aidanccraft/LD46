@@ -21,6 +21,9 @@ public class Assets {
 	
 	public static Texture selector;
 	
+	public static Texture radar;
+	public static Texture radarScan;
+	
 	public static Texture dark0, dark1, lens, terrain, water;
 	
 	public static void init(Graphics g) {
@@ -36,6 +39,9 @@ public class Assets {
 		logoAnim = new Animation(3, 3, 64, 20, draglantix, 0, 9, false);
 		
 		selector = new Texture("textures/selector.png");
+		
+		radar = new Texture("textures/radar.png");
+		radarScan = new Texture("textures/radarScan.png");
 		
 		dark0 = new Texture("textures/cameras/dark0.png");
 		dark1 = new Texture("textures/cameras/dark1.png");
