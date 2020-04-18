@@ -127,7 +127,6 @@ public class PlayState extends GameState {
 	}
 
 	private void drawSonar() {
-
 		float sonarLight = 1 - (sonarScale / maxSonarScale);
 
 		g.drawImage(Assets.sonarDot, new Vector2f(0, 0), new Vector2f(2), new Vector2f(0), new Color(128, 160, 128, 1));
@@ -147,7 +146,7 @@ public class PlayState extends GameState {
 		}
 	}
 
-	private void drawCamera() { // Add small details in bubbles for each direction
+	private void drawCamera() {
 		g.drawMode(g.DRAW_SCREEN);
 
 		Terrain.render(g, sub, bounds, currentState);
@@ -166,8 +165,8 @@ public class PlayState extends GameState {
 					new Color(255, 255, 255, 0.5f));
 		}
 
-		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.calculateLight()));
+		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
 	}
 }

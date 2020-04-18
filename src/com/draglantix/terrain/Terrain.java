@@ -65,8 +65,6 @@ public class Terrain {
 			float distance = Math.max(Math.abs(sub.getPosition().x - min.x) + offset,
 					Math.abs(sub.getPosition().y - min.y) + offset);
 
-			System.out.println(distance);
-
 			distance = (float) (Math.log10(distance) / Math.log10(4));
 
 			if (distance > 1) {
