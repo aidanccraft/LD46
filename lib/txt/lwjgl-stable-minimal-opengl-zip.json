@@ -1,0 +1,21 @@
+{
+  "build": "stable",
+  "mode": "zip",
+  "selectedAddons": [
+    "joml"
+  ],
+  "platform": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "descriptions": false,
+  "compact": false,
+  "hardcoded": false,
+  "javadoc": true,
+  "includeJSON": true,
+  "source": true,
+  "osgi": false,
+  "language": "groovy",
+  "preset": "minimal-opengl"
+}
