@@ -94,15 +94,19 @@ public class PlayState extends GameState {
 
 	@Override
 	public void render() {
-		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth(), Window.getHeight()), new Vector2f(0), new Color(100, 85, 76, 1));
+		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
 		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
 		
 		if (currentState < 4) {
 			drawCamera();
 		} else {
 			drawSonar();
 		}
+		
+		g.drawImage(Assets.screen, new Vector2f(0, 70), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		
 		drawStats();
 	}
 
