@@ -8,7 +8,6 @@ import com.draglantix.flare.textures.Animation;
 import com.draglantix.flare.textures.Font;
 import com.draglantix.flare.textures.SpriteSheet;
 import com.draglantix.flare.textures.Texture;
-import com.draglantix.utils.SpriteSheetParser;
 
 public class Assets {
 
@@ -22,13 +21,7 @@ public class Assets {
 	
 	public static Texture selector;
 	
-	public static SpriteSheetParser tiles;
-	
-	public static SpriteSheet player, sheep, slime;
-	
-	public static Animation playerIdle, playerInteract, playerSwimming, playerDie;
-
-	public static Animation sheepIdle, sheepInteract;
+	public static Texture dark0, dark1, lens, terrain, water;
 	
 	public static void init(Graphics g) {
 
@@ -44,18 +37,10 @@ public class Assets {
 		
 		selector = new Texture("textures/selector.png");
 		
-		tiles = new SpriteSheetParser(new SpriteSheet("textures/tiles.png"), 8);
-		
-		player = new SpriteSheet("textures/player.png");
-		sheep = new SpriteSheet("textures/sheep.png");
-		
-		playerIdle = new Animation(4, 4, 8, 4, player, 0, 2, true);
-		playerInteract = new Animation(4, 4, 8, 16, player, 1, 4, false);
-		playerSwimming = new Animation(4, 4, 8, 4, player, 5, 3, true);
-		playerDie = new Animation(4, 4, 8, 8, player, 8, 4, false);
-		
-		sheepIdle = new Animation(2, 2, 8, 4, sheep, 0, 2, true);
-		sheepInteract = new Animation(2, 2, 8, 4, sheep, 2, 2, false);
-	
+		dark0 = new Texture("textures/cameras/dark0.png");
+		dark1 = new Texture("textures/cameras/dark1.png");
+		lens = new Texture("textures/cameras/lens.png");
+		terrain = new Texture("textures/cameras/terrain.png");
+		water = new Texture("textures/cameras/water.png");
 	}
 }
