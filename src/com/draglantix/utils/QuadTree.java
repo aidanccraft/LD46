@@ -94,6 +94,32 @@ public class QuadTree {
 		return found;
 	}
 	
+	public List<AABB> query(Vector2f pos, float radius) {
+		return queryrad(new Quad(pos, new Vector2f(radius)), null);
+	}
+	
+	private List<AABB> queryrad(Quad range, List<AABB> last) {
+		if(last == null) {
+			last = new ArrayList<AABB>();
+		}
+			
+		List<AABB> found = new ArrayList<AABB>();
+		if(bound.intersects(range)) {
+			for(AABB b : boxes) {
+				if(!(range.getPos().distance(b.getCenter()) > range.getHalfLengths().x))
+					found.add(b);
+			}
+			
+			if(divided) {
+				found.addAll(northEast.query(range.getPos(), range.getHalfLengths().x));
+				found.addAll(northWest.query(range.getPos(), range.getHalfLengths().x));
+				found.addAll(southEast.query(range.getPos(), range.getHalfLengths().x));
+				found.addAll(southWest.query(range.getPos(), range.getHalfLengths().x));
+			}
+		}
+		return found;
+	}
+	
 	public void render(Graphics g) {
 		
 		g.drawImage(Assets.debug, bound.getPos(), new Vector2f(bound.getHalfLengths().x * 2, bound.getHalfLengths().y * 2), new Vector2f(0), new Color(255, 255, 255, 1));

@@ -31,6 +31,7 @@ public class PlayState extends GameState {
 	private int currentState = 0;
 
 	public static List<AABB> bounds = new ArrayList<AABB>();
+	private List<AABB> sonarBounds = new ArrayList<AABB>();
 
 	private QuadTree qt;
 
@@ -64,20 +65,30 @@ public class PlayState extends GameState {
 	public void tick() {
 		handleSubstates();
 
-		if (currentState == 4) {
-			if (sonarScale == 0) {
-				Assets.submarineSFX.play(Assets.sonarPing);
-			}
+		if (sonarScale == 0) {
+			Assets.submarineSFX.play(Assets.sonarPing);
+		}
 
-			sonarScale++;
-			if (sonarScale > maxSonarScale) {
-				sonarScale = 0;
-			}
+		sonarScale++;
+		if (sonarScale > maxSonarScale) {
+			sonarScale = 0;
+			this.sonarBounds.removeAll(sonarBounds);
 		}
 
 		sub.update();
 
 		PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
+		
+		if(currentState == 4) {
+			List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 25 * (sonarScale/maxSonarScale));
+			for(AABB t : tmpsonar) {
+				if(!this.sonarBounds.contains(t)) {
+					this.sonarBounds.add(t);
+				}
+			}
+		}else {
+			this.sonarBounds.removeAll(sonarBounds);
+		}
 	}
 
 	@Override
@@ -89,14 +100,6 @@ public class PlayState extends GameState {
 			drawSonar();
 		}
 		drawStats();
-		
-		//qt.render(g);
-		
-		for(AABB b : bounds) {
-			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
-		}
-		
-		g.drawImage(Assets.blank, sub.bounds.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), sub.bounds.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
 	}
 
 	private void handleSubstates() {
@@ -105,18 +108,10 @@ public class PlayState extends GameState {
 			if (currentState > states.size() - 1) {
 				currentState = 0;
 			}
-			
-			if(currentState == 4) {
-				sonarScale = 0;
-			}
 		} else if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
 			currentState--;
 			if (currentState < 0) {
 				currentState = states.size() - 1;
-			}
-			
-			if(currentState == 4) {
-				sonarScale = 0;
 			}
 		}
 	}
@@ -131,9 +126,24 @@ public class PlayState extends GameState {
 	}
 
 	private void drawSonar() {
+		
+		float sonarLight = 1 - (sonarScale / maxSonarScale);
+		
 		g.drawImage(Assets.sonarDot, new Vector2f(0, 0), new Vector2f(2), new Vector2f(0), new Color(128, 160, 128, 1));
+		
+		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(maxSonarScale), new Vector2f(0),
+				new Color(128, 160, 128, .4f));
+		
+		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(maxSonarScale/2), new Vector2f(0),
+				new Color(128, 160, 128, .4f));
+		
 		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(sonarScale), new Vector2f(0),
-				new Color(128, 160, 128, 1 - (sonarScale / maxSonarScale)));
+				new Color(128, 160, 128, sonarLight));
+		
+		
+		for(AABB b : sonarBounds) {
+			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
+		}
 	}
 
 	private void drawCamera() { // Add small details in bubbles for each direction
