@@ -15,6 +15,7 @@ import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
 import com.draglantix.utils.ImageDecoder;
+import com.draglantix.utils.Quad;
 import com.draglantix.utils.QuadTree;
 
 public class PlayState extends GameState {
@@ -47,12 +48,15 @@ public class PlayState extends GameState {
 		
 		map = ImageDecoder.decode("res/textures/map.png");
 		
-//		for(int x = 0; x < map.length; x++) {
-//			for(int y = 0; y < map[x].length; y++) {
-//				if(map[x][y])
-//					bounds.add(new AABB(new Vector2f(x, -y), new Vector2f(1), false));
-//			}
-//		}
+		qt = new QuadTree(new Quad(new Vector2f(Assets.map.getWidth()/2, -Assets.map.getWidth()/2),
+				new Vector2f(Assets.map.getWidth()/2, Assets.map.getWidth()/2)), 5);
+		
+		for(int x = 0; x < map.length; x++) {
+			for(int y = 0; y < map[x].length; y++) {
+				if(map[x][y])
+					qt.insert(new AABB(new Vector2f(x, -y), new Vector2f(1), false));
+			}
+		}
 		
 	}
 
@@ -70,6 +74,8 @@ public class PlayState extends GameState {
 		}
 		
 		sub.update();
+		
+		PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
 	}
 
 	@Override
@@ -82,9 +88,13 @@ public class PlayState extends GameState {
 		}
 		drawStats();
 		
+		//qt.render(g);
+		
 		for(AABB b : bounds) {
 			g.drawImage(Assets.debug, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
 		}
+		
+		g.drawImage(Assets.debug, sub.bounds.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), sub.bounds.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
 	}
 	
 	private void handleSubstates() {
@@ -119,7 +129,7 @@ public class PlayState extends GameState {
 	private void drawCamera() { //Add small details in bubbles for each direction
 		g.drawMode(g.DRAW_SCREEN);
 		g.drawTerrain(Assets.terrain, Assets.map, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1), sub.getPosition(), currentState);
-		System.out.println(sub.getPosition());
+		//System.out.println(sub.getPosition());
 //		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 //				new Color(255, 255, 255, sub.getDistance("UP")));
 //		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));

@@ -16,7 +16,7 @@ public class Submarine {
 	
 	private boolean lights = false;
 	
-	private AABB bounds;
+	public AABB bounds;
 	
 	public Submarine(Vector2f position, float resistiveForce) {
 		this.position = position;

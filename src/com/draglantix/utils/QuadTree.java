@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.joml.Vector2f;
 
+import com.draglantix.flare.collision.AABB;
 import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.main.Assets;
 
 public class QuadTree {
 
-	private List<AABB> boxes = new ArrayList<Vector2f>();
+	private List<AABB> boxes = new ArrayList<AABB>();
 	
 	private Quad bound;
 	private int capacity;
@@ -28,25 +29,25 @@ public class QuadTree {
 		this.divided = false;
 	}
 	
-	public boolean insert(Vector2f p) {
+	public boolean insert(AABB b) {
 		
-		if(!bound.contains(p))
+		if(!bound.contains(b.getCenter()))
 			return false;
 		
-		if(points.size() < capacity-1) {
-			points.add(p);
+		if(boxes.size() < capacity-1) {
+			boxes.add(b);
 			return true;
 		}else {
 			if(!divided) {
 				subdivide();
 			}
-			if(northEast.insert(p)) {
+			if(northEast.insert(b)) {
 				return true;
-			}else if(northWest.insert(p)){
+			}else if(northWest.insert(b)){
 				return true;
-			}else if(southEast.insert(p)) {
+			}else if(southEast.insert(b)) {
 				return true;
-			}else if(southWest.insert(p)) {
+			}else if(southWest.insert(b)) {
 				return true;
 			}
 			return false;
@@ -67,20 +68,20 @@ public class QuadTree {
 		divided = true;
 	}
 	
-	public List<Vector2f> query(Quad range) {
+	public List<AABB> query(Quad range) {
 		return query(range, null);
 	}
 	
-	private List<Vector2f> query(Quad range, List<Vector2f> last) {
+	private List<AABB> query(Quad range, List<AABB> last) {
 		if(last == null) {
-			last = new ArrayList<Vector2f>();
+			last = new ArrayList<AABB>();
 		}
 			
-		List<Vector2f> found = new ArrayList<Vector2f>();
+		List<AABB> found = new ArrayList<AABB>();
 		if(bound.intersects(range)) {
-			for(Vector2f p : points) {
-				if(range.contains(p))
-					found.add(p);
+			for(AABB b : boxes) {
+				if(range.contains(b.getCenter()))
+					found.add(b);
 			}
 			
 			if(divided) {
@@ -104,8 +105,8 @@ public class QuadTree {
 			southWest.render(g);
 		}
 		
-		for(Vector2f p : points) {
-			g.drawImage(Assets.debug, p, new Vector2f(1, 1), new Vector2f(90, 0), new Color(0, 255, 255, 1));
+		for(AABB b : boxes) {
+			g.drawImage(Assets.debug, b.getCenter(), new Vector2f(1, 1), new Vector2f(90, 0), new Color(0, 255, 255, 1));
 		}
 	}
 }
