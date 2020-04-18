@@ -91,10 +91,10 @@ public class PlayState extends GameState {
 		//qt.render(g);
 		
 		for(AABB b : bounds) {
-			g.drawImage(Assets.debug, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
+			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
 		}
 		
-		g.drawImage(Assets.debug, sub.bounds.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), sub.bounds.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.blank, sub.bounds.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4), sub.bounds.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(255, 255, 255, 1));
 	}
 	
 	private void handleSubstates() {

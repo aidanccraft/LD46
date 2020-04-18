@@ -28,6 +28,8 @@ public class Assets {
 	
 	public static Texture dark0, dark1, lens, terrain, water, map;
 	
+	public static Texture blank;
+	
 	public static Source submarineSFX;
 	
 	public static int sonarPing;
@@ -55,6 +57,8 @@ public class Assets {
 		terrain = new Texture("textures/cameras/terrain.png");
 		water = new Texture("textures/cameras/water.png");
 		map = new Texture("textures/map.png");
+		
+		blank = new Texture("textures/blank.png");
 		
 		submarineSFX = new Source(1.5f, 1000, 0);
 		submarineSFX.setPosition(new Vector2f(0, 0));
