@@ -41,7 +41,7 @@ public class Submarine {
 		}
 		
 		if(Window.getInput().isKeyDown(GLFW.GLFW_KEY_A)) {
-			this.velocity.add(-0.015f, 0);
+			this.velocity.add(-0.0015f, 0);
 		} else if(Window.getInput().isKeyDown(GLFW.GLFW_KEY_D)) {
 			this.velocity.add(0.0015f, 0);
 		}

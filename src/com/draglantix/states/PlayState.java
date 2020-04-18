@@ -14,6 +14,7 @@ import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
+import com.draglantix.terrain.Terrain;
 import com.draglantix.utils.ImageDecoder;
 import com.draglantix.utils.Quad;
 import com.draglantix.utils.QuadTree;
@@ -78,15 +79,15 @@ public class PlayState extends GameState {
 		sub.update();
 
 		PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
-		
-		if(currentState == 4) {
-			List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 25 * (sonarScale/maxSonarScale));
-			for(AABB t : tmpsonar) {
-				if(!this.sonarBounds.contains(t)) {
+
+		if (currentState == 4) {
+			List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 25 * (sonarScale / maxSonarScale));
+			for (AABB t : tmpsonar) {
+				if (!this.sonarBounds.contains(t)) {
 					this.sonarBounds.add(t);
 				}
 			}
-		}else {
+		} else {
 			this.sonarBounds.removeAll(sonarBounds);
 		}
 	}
@@ -129,47 +130,46 @@ public class PlayState extends GameState {
 	}
 
 	private void drawSonar() {
-		
 		float sonarLight = 1 - (sonarScale / maxSonarScale);
-		
+
 		g.drawImage(Assets.sonarDot, new Vector2f(0, 0), new Vector2f(2), new Vector2f(0), new Color(128, 160, 128, 1));
-		
+
 		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(maxSonarScale), new Vector2f(0),
 				new Color(128, 160, 128, .4f));
-		
-		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(maxSonarScale/2), new Vector2f(0),
+
+		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(maxSonarScale / 2), new Vector2f(0),
 				new Color(128, 160, 128, .4f));
-		
+
 		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(sonarScale), new Vector2f(0),
 				new Color(128, 160, 128, sonarLight));
-		
-		
-		for(AABB b : sonarBounds) {
-			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(2), b.getScale().mul(2, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
+
+		for (AABB b : sonarBounds) {
+			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(4),
+					b.getScale().mul(4, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
 		}
 	}
 
-	private void drawCamera() { // Add small details in bubbles for each direction
+	private void drawCamera() {
 		g.drawMode(g.DRAW_SCREEN);
-		g.drawTerrain(Assets.terrain, Assets.map, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-				new Color(255, 255, 255, 1), sub.getPosition(), currentState);
-		// System.out.println(sub.getPosition());
+
+		Terrain.render(g, sub, bounds, currentState);
+
 		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.getDistance("UP")));
-		
-		if(currentState == 0) {
+
+		if (currentState == 0) {
 			g.drawImage(Assets.bubbleUpAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
-		}else if(currentState == 1) {
+		} else if (currentState == 1) {
 			g.drawImage(Assets.bubbleDownAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
-		}else {
+		} else {
 			g.drawImage(Assets.bubbleAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
 		}
-		
-		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
+
 		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.calculateLight()));
+		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
 	}
 }
