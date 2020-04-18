@@ -151,10 +151,22 @@ public class PlayState extends GameState {
 		g.drawTerrain(Assets.terrain, Assets.map, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, 1), sub.getPosition(), currentState);
 		// System.out.println(sub.getPosition());
-//		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-//				new Color(255, 255, 255, sub.getDistance("UP")));
-//		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
-//		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-//				new Color(255, 255, 255, sub.calculateLight()));
+		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
+				new Color(255, 255, 255, sub.getDistance("UP")));
+		
+		if(currentState == 0) {
+			g.drawImage(Assets.bubbleUpAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
+					new Color(255, 255, 255, 0.5f));
+		}else if(currentState == 1) {
+			g.drawImage(Assets.bubbleDownAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
+					new Color(255, 255, 255, 0.5f));
+		}else {
+			g.drawImage(Assets.bubbleAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
+					new Color(255, 255, 255, 0.5f));
+		}
+		
+		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
+				new Color(255, 255, 255, sub.calculateLight()));
 	}
 }

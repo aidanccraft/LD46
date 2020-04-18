@@ -26,6 +26,15 @@ public class Assets {
 	public static Texture sonarRing;
 	public static Texture sonarDot;
 	
+	public static SpriteSheet bubbles;
+	public static Animation bubbleAnim;
+	
+	public static SpriteSheet bubblesUp;
+	public static Animation bubbleUpAnim;
+	
+	public static SpriteSheet bubblesDown;
+	public static Animation bubbleDownAnim;
+	
 	public static Texture dark0, dark1, lens, terrain, water, map;
 	
 	public static Texture blank;
@@ -57,6 +66,15 @@ public class Assets {
 		terrain = new Texture("textures/cameras/terrain.png");
 		water = new Texture("textures/cameras/water.png");
 		map = new Texture("textures/map.png");
+		
+		bubbles = new SpriteSheet("textures/cameras/bubbles.png");
+		bubbleAnim = new Animation(4, 4, 32, 15, bubbles, 0, 11, true);
+		
+		bubblesUp = new SpriteSheet("textures/cameras/bubblesUp.png");
+		bubbleUpAnim = new Animation(3, 3, 32, 15, bubblesUp, 0, 8, true);
+		
+		bubblesDown = new SpriteSheet("textures/cameras/bubblesDown.png");
+		bubbleDownAnim = new Animation(3, 3, 32, 15, bubblesDown, 0, 8, true);
 		
 		blank = new Texture("textures/blank.png");
 		
