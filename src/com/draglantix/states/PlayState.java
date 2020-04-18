@@ -29,7 +29,7 @@ public class PlayState extends GameState {
 	private boolean[][] map;
 
 	private Map<Integer, String> states = new HashMap<Integer, String>();
-	private int currentState = 0;
+	private int currentState;
 
 	public static List<AABB> bounds = new ArrayList<AABB>();
 	private List<AABB> sonarBounds = new ArrayList<AABB>();
@@ -41,7 +41,9 @@ public class PlayState extends GameState {
 	}
 
 	public void init() {
-		sub = new Submarine(new Vector2f(50, -10), 0.05f);
+		sub = new Submarine(new Vector2f(10, -10), 0.2f);
+		currentState = 0;
+		
 		states.put(0, "CAMERA DOWN");
 		states.put(1, "CAMERA UP");
 		states.put(2, "CAMERA LEFT");
@@ -70,7 +72,7 @@ public class PlayState extends GameState {
 			Assets.submarineSFX.play(Assets.sonarPing);
 		}
 
-		sonarScale++;
+		sonarScale += .5f;
 		if (sonarScale > maxSonarScale) {
 			sonarScale = 0;
 			this.sonarBounds.removeAll(sonarBounds);
@@ -90,6 +92,11 @@ public class PlayState extends GameState {
 		} else {
 			this.sonarBounds.removeAll(sonarBounds);
 		}
+		
+		if(!sub.isAlive()) {
+			gsm.setState(States.GAMEOVER);
+		}
+		
 	}
 
 	@Override
@@ -130,6 +137,12 @@ public class PlayState extends GameState {
 		g.drawString(Assets.font, "Depth: " + (int) sub.getDepth() + " m", new Vector2f(0, 64), new Vector2f(6),
 				new Color(255, 255, 255, 1), g.FONT_CENTER);
 		g.drawString(Assets.font, "Lights: " + sub.isLights(), new Vector2f(0, 56), new Vector2f(6),
+				new Color(255, 255, 255, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, "Oxygen: " + (int) Math.ceil(sub.getOxygen()) + "%", new Vector2f(0, -72), new Vector2f(6),
+				new Color(255, 255, 255, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, "Power: " + (int) Math.ceil(sub.getPower()) + "%", new Vector2f(0, -64), new Vector2f(6),
+				new Color(255, 255, 255, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, "Integrity: " + (int) Math.ceil(sub.getIntegrity()) + "%", new Vector2f(0, -56), new Vector2f(6),
 				new Color(255, 255, 255, 1), g.FONT_CENTER);
 	}
 
@@ -175,5 +188,9 @@ public class PlayState extends GameState {
 		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.calculateLight()));
 		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
+	}
+	
+	public Submarine getSub() {
+		return sub;
 	}
 }
