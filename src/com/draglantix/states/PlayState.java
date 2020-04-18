@@ -60,24 +60,10 @@ public class PlayState extends GameState {
 	@Override
 	public void render() {
 		g.clearColor(new Color(255, 255, 255, 1));
-		switch(currentState) {
-			case 0:
-				drawCamera();
-				break;
-			case 1:
-				drawCamera();
-				break;
-			case 2:
-				drawCamera();
-				break;
-			case 3:
-				drawCamera();
-				break;
-			case 4:
-				drawSonar();
-				break;
-			default:
-				break;
+		if(currentState < 4) {
+			drawCamera();
+		}else {
+			drawSonar();
 		}
 		drawStats();
 	}
@@ -111,9 +97,9 @@ public class PlayState extends GameState {
 		g.drawImage(Assets.sonarRing, new Vector2f(0, 0), new Vector2f(sonarScale), new Vector2f(0),new Color(128, 160, 128, 1 - (sonarScale/maxSonarScale)));
 	}
 
-	private void drawCamera() {
+	private void drawCamera() { //Add small details in bubbles for each direction
 		g.drawMode(g.DRAW_SCREEN);
-		g.drawTerrain(Assets.terrain, Assets.map, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1), sub.getPosition());
+		g.drawTerrain(Assets.terrain, Assets.map, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1), sub.getPosition(), currentState);
 		System.out.println(sub.getPosition());
 //		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 //				new Color(255, 255, 255, sub.getDistance("UP")));
