@@ -15,6 +15,7 @@ import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
 import com.draglantix.terrain.Terrain;
+import com.draglantix.utils.DragonMath;
 import com.draglantix.utils.ImageDecoder;
 import com.draglantix.utils.Quad;
 import com.draglantix.utils.QuadTree;
@@ -26,10 +27,12 @@ public class PlayState extends GameState {
 	private float sonarScale = 0;
 	private float maxSonarScale = 80;
 
-	private boolean[][] map;
+	private int[][] map;
 
 	private Map<Integer, String> states = new HashMap<Integer, String>();
 	private int currentState;
+	
+	private Map<Integer, String> biomes = new HashMap<Integer, String>();
 
 	public static List<AABB> bounds = new ArrayList<AABB>();
 	private List<AABB> sonarBounds = new ArrayList<AABB>();
@@ -41,14 +44,21 @@ public class PlayState extends GameState {
 	}
 
 	public void init() {
-		sub = new Submarine(new Vector2f(10, -10), 0.2f);
+		sub = new Submarine(new Vector2f(33, -10), 0.2f);
 		currentState = 0;
 		
-		states.put(0, "CAMERA DOWN");
-		states.put(1, "CAMERA UP");
-		states.put(2, "CAMERA LEFT");
-		states.put(3, "CAMERA RIGHT");
+		states.put(0, "WINDOW DOWN");
+		states.put(1, "WINDOW UP");
+		states.put(2, "WINDOW LEFT");
+		states.put(3, "WINDOW RIGHT");
 		states.put(4, "SONAR");
+		
+		biomes.put(0, "...");
+		biomes.put(1, "Shallows");
+		biomes.put(2, "Caves");
+		biomes.put(3, "Deep Caves");
+		biomes.put(4, "Open Ocean");
+		biomes.put(4, "Abyssal Zone");
 
 		map = ImageDecoder.decode("res/textures/map.png");
 
@@ -57,8 +67,10 @@ public class PlayState extends GameState {
 
 		for (int x = 0; x < map.length; x++) {
 			for (int y = 0; y < map[x].length; y++) {
-				if (map[x][y])
+				if (map[x][y] == 0) {
 					qt.insert(new AABB(new Vector2f(x, -y), new Vector2f(1), false));
+					
+				}
 			}
 		}
 
@@ -104,7 +116,6 @@ public class PlayState extends GameState {
 		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
 		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
 		
 		if (currentState < 4) {
 			drawCamera();
@@ -112,9 +123,9 @@ public class PlayState extends GameState {
 			drawSonar();
 		}
 		
-		g.drawImage(Assets.screen, new Vector2f(0, 70), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		
 		drawStats();
+		
+		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
 	}
 
 	private void handleSubstates() {
@@ -132,18 +143,44 @@ public class PlayState extends GameState {
 	}
 
 	private void drawStats() {
-		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 72), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, "Depth: " + (int) sub.getDepth() + " m", new Vector2f(0, 64), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, "Lights: " + sub.isLights(), new Vector2f(0, 56), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, "Oxygen: " + (int) Math.ceil(sub.getOxygen()) + "%", new Vector2f(0, -72), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, "Power: " + (int) Math.ceil(sub.getPower()) + "%", new Vector2f(0, -64), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, "Integrity: " + (int) Math.ceil(sub.getIntegrity()) + "%", new Vector2f(0, -56), new Vector2f(6),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
+		g.drawImage(Assets.screen, new Vector2f(0, 65), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.screen, new Vector2f(0, -65), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		
+		g.drawImage(Assets.screen, new Vector2f(64, 45), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Oxygen", new Vector2f(64, 45), new Vector2f(4),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
+		g.drawImage(Assets.gaugeFace, new Vector2f(64, 20), new Vector2f(32), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.needle, new Vector2f(64, 20), new Vector2f(32), new Vector2f(DragonMath.percentToTheta((float)Math.ceil(sub.getOxygen())), 0), new Color(255, 255, 255, 1));
+		
+		g.drawImage(Assets.screen, new Vector2f(64, -10), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Power", new Vector2f(64, -10), new Vector2f(4),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
+		g.drawImage(Assets.gaugeFace, new Vector2f(64, -35), new Vector2f(32), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.needle, new Vector2f(64, -35), new Vector2f(32), new Vector2f(DragonMath.percentToTheta((float)Math.ceil(sub.getPower())), 0), new Color(255, 255, 255, 1));
+		
+		g.drawImage(Assets.screen, new Vector2f(-64, 45), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Lights", new Vector2f(-64, 45), new Vector2f(4),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
+		g.drawImage(Assets.screen, new Vector2f(-64, 28), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, (sub.isLights() ? "ON" : "OFF"), new Vector2f(-64, 28), new Vector2f(4),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
+		g.drawImage(Assets.screen, new Vector2f(-64, -10), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Hull", new Vector2f(-64, -10), new Vector2f(4),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
+		g.drawImage(Assets.screen, new Vector2f(-64, -27), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())), new Vector2f(-64, -27), new Vector2f(4),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
+		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 64), new Vector2f(6),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, (int) sub.getDepth() + " m", new Vector2f(0, -64), new Vector2f(6),
+				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		
 	}
 
 	private void drawSonar() {

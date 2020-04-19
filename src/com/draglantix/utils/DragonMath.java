@@ -20,6 +20,23 @@ public class DragonMath {
 		Vector4f worldRay = clipCoords.mul(m);
 		return new Vector2f(worldRay.x / g.getScale(), worldRay.y / g.getScale());
 	}
+	
+	public static float percentToTheta(float percent) {
+		float dec = percent / 100;
+		return (dec * 300) - 150;
+	}
+	
+	public static String evaluateIntegrity(float integrity) {
+		if(integrity > 70) {
+			return "Good";
+		}else if(integrity <= 70 && integrity > 50) {
+			return "Ok";
+		}else if(integrity <= 50 && integrity > 20) {
+			return "Severely Damaged";
+		}else {
+			return "Critical";
+		}
+	}
 
 	public static int floor(float num) {
 		return (int) Math.floor((double) num);

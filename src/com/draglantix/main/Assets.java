@@ -23,7 +23,7 @@ public class Assets {
 	
 	public static Texture selector;
 	
-	public static Texture panel, screen;
+	public static Texture panel, screen, gaugeFace, needle;
 	
 	public static Texture sonarRing;
 	public static Texture sonarDot;
@@ -38,6 +38,8 @@ public class Assets {
 	public static Animation bubbleDownAnim;
 	
 	public static Texture dark0, dark1, lens, terrain, water, map;
+	
+	public static Texture leech;
 	
 	public static Texture blank;
 	
@@ -62,6 +64,9 @@ public class Assets {
 		panel = new Texture("textures/panel.png");
 		screen = new Texture("textures/screen.png");
 		
+		gaugeFace = new Texture("textures/gaugeFace.png");
+		needle = new Texture("textures/needle.png");
+		
 		sonarRing = new Texture("textures/sonar/sonarring.png");
 		sonarDot = new Texture("textures/sonar/sonardot.png");
 		
@@ -80,6 +85,8 @@ public class Assets {
 		
 		bubblesDown = new SpriteSheet("textures/cameras/bubblesDown.png");
 		bubbleDownAnim = new Animation(3, 3, 32, 15, bubblesDown, 0, 8, true);
+		
+		leech = new Texture("textures/leech.png");
 		
 		blank = new Texture("textures/blank.png");
 		
