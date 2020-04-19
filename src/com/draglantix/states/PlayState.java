@@ -28,15 +28,15 @@ public class PlayState extends GameState {
 	private Submarine sub;
 
 	private Random rand = new Random();
-	
+
 	private Vector3f ambientDir = new Vector3f(1, 0, 0);
-	
+
 	private float sonarScale = 0;
 	private float maxSonarScale = 80;
 
 	private int[][] map;
 	private List<SupplyStation> supplyStations = new ArrayList<SupplyStation>();
-	private Vector2f[] supplyStationLocations = { new Vector2f(36, -37), new Vector2f(96, -274),
+	private Vector2f[] supplyStationLocations = { new Vector2f(219, -140), new Vector2f(96, -274),
 			new Vector2f(255, -345), new Vector2f(273, -505), new Vector2f(245, -553), new Vector2f(346, -692),
 			new Vector2f(356, -503), new Vector2f(528, -466), new Vector2f(410, -317), new Vector2f(656, -352),
 			new Vector2f(356, -167), new Vector2f(271, -101) };
@@ -94,10 +94,9 @@ public class PlayState extends GameState {
 
 		closestStation = supplyStations.get(0);
 
-		
 		Assets.submarineSFX0.setLooping(true);
 		Assets.submarineSFX0.play(Assets.waterambient);
-		
+
 		Assets.submarineSFX1.setLooping(true);
 		Assets.submarineSFX1.play(Assets.subengine);
 	}
@@ -105,9 +104,9 @@ public class PlayState extends GameState {
 	@Override
 	public void tick() {
 		handleSubstates();
-		
+
 		handleAudio();
-		
+
 		sonarScale += .5f;
 		if (sonarScale > maxSonarScale) {
 			sonarScale = 0;
@@ -152,8 +151,8 @@ public class PlayState extends GameState {
 		for (SupplyStation station : supplyStations) {
 			station.checkCollision(sub);
 		}
-		
-		if(!sub.isAlive()) {
+
+		if (!sub.isAlive()) {
 			Assets.submarineSFX1.setVolume(0f);
 			gsm.setState(States.GAMEOVER);
 		}
@@ -192,28 +191,27 @@ public class PlayState extends GameState {
 			}
 		}
 	}
-	
+
 	private void handleAudio() {
 		if (sonarScale == 0) {
 			Assets.sonarSFX.play(Assets.sonarPing);
 		}
-		
+
 		Assets.submarineSFX1.setVolume(6f * sub.getVelocity().length());
-		
-		if(!Assets.submarineSFX2.isPlaying() && rand.nextInt(1000) > 990) {
-			
+
+		if (!Assets.submarineSFX2.isPlaying() && rand.nextInt(1000) > 990) {
+
 			float theta = (float) (rand.nextFloat() * 2 * Math.PI);
 			float phi = (float) (rand.nextFloat() * 2 * Math.PI);
-			
+
 			ambientDir = new Vector3f((float) (Math.cos(theta) * ambientDir.x),
-					(float) (Math.sin(theta) * ambientDir.y),
-					(float) (Math.cos(phi) * ambientDir.z));
-			
+					(float) (Math.sin(theta) * ambientDir.y), (float) (Math.cos(phi) * ambientDir.z));
+
 			Assets.submarineSFX2.setPosition3D(ambientDir);
-			
-			if(rand.nextInt(10) > 5) {
+
+			if (rand.nextInt(10) > 5) {
 				Assets.submarineSFX2.play(Assets.subambient0);
-			}else {
+			} else {
 				Assets.submarineSFX2.play(Assets.subambient1);
 			}
 		}
@@ -256,15 +254,17 @@ public class PlayState extends GameState {
 				new Color(255, 255, 255, 1));
 		g.drawString(Assets.font, (sub.isLights() ? "ON" : "OFF"), new Vector2f(-64, 28), new Vector2f(4),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.screen, new Vector2f(-64, -10), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, "Hull", new Vector2f(-64, -10), new Vector2f(4),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.screen, new Vector2f(-64, -27), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())), new Vector2f(-64, -27), new Vector2f(3),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
+
+		g.drawImage(Assets.screen, new Vector2f(-64, -10), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Hull", new Vector2f(-64, -10), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+
+		g.drawImage(Assets.screen, new Vector2f(-64, -27), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())),
+				new Vector2f(-64, -27), new Vector2f(3), new Color(200, 174, 146, 1), g.FONT_CENTER);
+
 		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
 		g.drawString(Assets.font,
@@ -297,6 +297,16 @@ public class PlayState extends GameState {
 
 			double stationLoc = Math.atan((sub.getPosition().y - closestStation.getPosition().y)
 					/ (sub.getPosition().x - closestStation.getPosition().x));
+
+			if (sub.getPosition().y - closestStation.getPosition().y > 0
+					&& sub.getPosition().x - closestStation.getPosition().x > 0) {
+				stationLoc += Math.PI;
+			}
+			
+			if (sub.getPosition().y - closestStation.getPosition().y < 0
+					&& sub.getPosition().x - closestStation.getPosition().x > 0) {
+				stationLoc += Math.PI;
+			}
 
 			g.drawImage(Assets.blank,
 					new Vector2f((float) (maxSonarScale / 2 * Math.cos(stationLoc)),
