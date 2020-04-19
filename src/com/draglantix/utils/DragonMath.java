@@ -32,7 +32,7 @@ public class DragonMath {
 		}else if(integrity <= 70 && integrity > 50) {
 			return "Ok";
 		}else if(integrity <= 50 && integrity > 20) {
-			return "Severely Damaged";
+			return "Damaged";
 		}else {
 			return "Critical";
 		}

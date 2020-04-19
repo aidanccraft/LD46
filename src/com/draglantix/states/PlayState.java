@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import com.draglantix.entities.Submarine;
@@ -24,6 +26,10 @@ public class PlayState extends GameState {
 
 	private Submarine sub;
 
+	private Random rand = new Random();
+	
+	private Vector3f ambientDir = new Vector3f(1, 0, 0);
+	
 	private float sonarScale = 0;
 	private float maxSonarScale = 80;
 
@@ -73,17 +79,20 @@ public class PlayState extends GameState {
 				}
 			}
 		}
-
+		
+		Assets.submarineSFX0.setLooping(true);
+		Assets.submarineSFX0.play(Assets.waterambient);
+		
+		Assets.submarineSFX1.setLooping(true);
+		Assets.submarineSFX1.play(Assets.subengine);
 	}
 
 	@Override
 	public void tick() {
 		handleSubstates();
-
-		if (sonarScale == 0) {
-			Assets.submarineSFX.play(Assets.sonarPing);
-		}
-
+		
+		handleAudio();
+		
 		sonarScale += .5f;
 		if (sonarScale > maxSonarScale) {
 			sonarScale = 0;
@@ -106,6 +115,7 @@ public class PlayState extends GameState {
 		}
 		
 		if(!sub.isAlive()) {
+			Assets.submarineSFX1.setVolume(0f);
 			gsm.setState(States.GAMEOVER);
 		}
 		
@@ -141,6 +151,32 @@ public class PlayState extends GameState {
 			}
 		}
 	}
+	
+	private void handleAudio() {
+		if (sonarScale == 0) {
+			Assets.sonarSFX.play(Assets.sonarPing);
+		}
+		
+		Assets.submarineSFX1.setVolume(6f * sub.getVelocity().length());
+		
+		if(!Assets.submarineSFX2.isPlaying() && rand.nextInt(1000) > 990) {
+			
+			float theta = (float) (rand.nextFloat() * 2 * Math.PI);
+			float phi = (float) (rand.nextFloat() * 2 * Math.PI);
+			
+			ambientDir = new Vector3f((float) (Math.cos(theta) * ambientDir.x),
+					(float) (Math.sin(theta) * ambientDir.y),
+					(float) (Math.cos(phi) * ambientDir.z));
+			
+			Assets.submarineSFX2.setPosition3D(ambientDir);
+			
+			if(rand.nextInt(10) > 5) {
+				Assets.submarineSFX2.play(Assets.subambient0);
+			}else {
+				Assets.submarineSFX2.play(Assets.subambient1);
+			}
+		}
+	}
 
 	private void drawStats() {
 		g.drawImage(Assets.screen, new Vector2f(0, 65), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
@@ -173,7 +209,7 @@ public class PlayState extends GameState {
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
 		
 		g.drawImage(Assets.screen, new Vector2f(-64, -27), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())), new Vector2f(-64, -27), new Vector2f(4),
+		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())), new Vector2f(-64, -27), new Vector2f(3),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
 		
 		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 64), new Vector2f(6),
