@@ -50,7 +50,7 @@ public class Assets {
 		camera = new Camera(new Vector2f(0, 0), 0, 0, .07f);
 		font = new Font(new SpriteSheet("textures/font.png"), 8, 1);
 		g.setCamera(camera);
-		Graphics.setScale(4);
+		g.setScale(4);
 		
 		debug = new Texture("textures/debug.png");
 		
