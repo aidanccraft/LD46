@@ -39,7 +39,8 @@ public class Assets {
 	
 	public static Texture dark0, dark1, lens, terrain, water, map;
 	
-	public static Texture leech;
+	public static SpriteSheet leech;
+	public static Animation leechAnim;
 	
 	public static Texture blank;
 	
@@ -86,7 +87,8 @@ public class Assets {
 		bubblesDown = new SpriteSheet("textures/cameras/bubblesDown.png");
 		bubbleDownAnim = new Animation(3, 3, 32, 15, bubblesDown, 0, 8, true);
 		
-		leech = new Texture("textures/leech.png");
+		leech = new SpriteSheet("textures/leech.png");
+		leechAnim = new Animation(2, 2, 64, 7, leech, 0, 2, true);
 		
 		blank = new Texture("textures/blank.png");
 		
