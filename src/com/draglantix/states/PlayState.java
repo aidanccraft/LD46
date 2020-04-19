@@ -14,6 +14,7 @@ import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
+import com.draglantix.terrain.SupplyStation;
 import com.draglantix.terrain.Terrain;
 import com.draglantix.utils.DragonMath;
 import com.draglantix.utils.ImageDecoder;
@@ -28,14 +29,22 @@ public class PlayState extends GameState {
 	private float maxSonarScale = 80;
 
 	private int[][] map;
+	private List<SupplyStation> supplyStations = new ArrayList<SupplyStation>();
+	private Vector2f[] supplyStationLocations = { new Vector2f(36, -37), new Vector2f(96, -274),
+			new Vector2f(255, -345), new Vector2f(273, -505), new Vector2f(245, -553), new Vector2f(346, -692),
+			new Vector2f(356, -503), new Vector2f(528, -466), new Vector2f(410, -317), new Vector2f(656, -352),
+			new Vector2f(356, -167), new Vector2f(271, -101) };
+
+	private SupplyStation closestStation;
 
 	private Map<Integer, String> states = new HashMap<Integer, String>();
 	private int currentState;
-	
+
 	private Map<Integer, String> biomes = new HashMap<Integer, String>();
 
 	public static List<AABB> bounds = new ArrayList<AABB>();
 	private List<AABB> sonarBounds = new ArrayList<AABB>();
+	private List<SupplyStation> sonarStations = new ArrayList<SupplyStation>();
 
 	private QuadTree qt;
 
@@ -46,13 +55,13 @@ public class PlayState extends GameState {
 	public void init() {
 		sub = new Submarine(new Vector2f(33, -10), 0.2f);
 		currentState = 0;
-		
+
 		states.put(0, "WINDOW DOWN");
 		states.put(1, "WINDOW UP");
 		states.put(2, "WINDOW LEFT");
 		states.put(3, "WINDOW RIGHT");
 		states.put(4, "SONAR");
-		
+
 		biomes.put(0, "...");
 		biomes.put(1, "Shallows");
 		biomes.put(2, "Caves");
@@ -69,10 +78,15 @@ public class PlayState extends GameState {
 			for (int y = 0; y < map[x].length; y++) {
 				if (map[x][y] == 0) {
 					qt.insert(new AABB(new Vector2f(x, -y), new Vector2f(1), false));
-					
 				}
 			}
 		}
+
+		for (Vector2f loc : supplyStationLocations) {
+			supplyStations.add(new SupplyStation(loc, new Vector2f(3)));
+		}
+
+		closestStation = supplyStations.get(0);
 
 	}
 
@@ -88,6 +102,7 @@ public class PlayState extends GameState {
 		if (sonarScale > maxSonarScale) {
 			sonarScale = 0;
 			this.sonarBounds.removeAll(sonarBounds);
+			this.sonarStations.removeAll(sonarStations);
 		}
 
 		sub.update();
@@ -101,31 +116,56 @@ public class PlayState extends GameState {
 					this.sonarBounds.add(t);
 				}
 			}
+
+			for (SupplyStation station : supplyStations) {
+				if (sub.getPosition().x + 20 * (sonarScale / maxSonarScale) > station.getPosition().x
+						- station.getScale().x / 2
+						&& sub.getPosition().x - 20 * (sonarScale / maxSonarScale) < station.getPosition().x
+								+ station.getScale().x / 2) {
+					if (sub.getPosition().y + 20 * (sonarScale / maxSonarScale) > station.getPosition().y
+							- station.getScale().y / 2
+							&& sub.getPosition().y - 20 * (sonarScale / maxSonarScale) < station.getPosition().y
+									+ station.getScale().y / 2) {
+						if (!this.sonarStations.contains(station)) {
+							this.sonarStations.add(station);
+						}
+					}
+				}
+
+			}
+
 		} else {
 			this.sonarBounds.removeAll(sonarBounds);
+			this.sonarStations.removeAll(sonarStations);
 		}
-		
-		if(!sub.isAlive()) {
+
+		for (SupplyStation station : supplyStations) {
+			station.checkCollision(sub);
+		}
+
+		if (!sub.isAlive()) {
 			gsm.setState(States.GAMEOVER);
 		}
-		
+
 	}
 
 	@Override
 	public void render() {
-		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
+		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth() / 2, Window.getHeight() / 2),
+				new Vector2f(0), new Color(100, 85, 76, 1));
 		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
-		
+
 		if (currentState < 4) {
 			drawCamera();
 		} else {
 			drawSonar();
 		}
-		
+
 		drawStats();
-		
-		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth()/2, Window.getHeight()/2), new Vector2f(0), new Color(100, 85, 76, 1));
+
+		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth() / 2, Window.getHeight() / 2),
+				new Vector2f(0), new Color(100, 85, 76, 1));
 	}
 
 	private void handleSubstates() {
@@ -143,43 +183,59 @@ public class PlayState extends GameState {
 	}
 
 	private void drawStats() {
-		g.drawImage(Assets.screen, new Vector2f(0, 65), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawImage(Assets.screen, new Vector2f(0, -65), new Vector2f(128, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		
-		g.drawImage(Assets.screen, new Vector2f(64, 45), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, "Oxygen", new Vector2f(64, 45), new Vector2f(4),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.gaugeFace, new Vector2f(64, 20), new Vector2f(32), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawImage(Assets.needle, new Vector2f(64, 20), new Vector2f(32), new Vector2f(DragonMath.percentToTheta((float)Math.ceil(sub.getOxygen())), 0), new Color(255, 255, 255, 1));
-		
-		g.drawImage(Assets.screen, new Vector2f(64, -10), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, "Power", new Vector2f(64, -10), new Vector2f(4),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.gaugeFace, new Vector2f(64, -35), new Vector2f(32), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawImage(Assets.needle, new Vector2f(64, -35), new Vector2f(32), new Vector2f(DragonMath.percentToTheta((float)Math.ceil(sub.getPower())), 0), new Color(255, 255, 255, 1));
-		
-		g.drawImage(Assets.screen, new Vector2f(-64, 45), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, "Lights", new Vector2f(-64, 45), new Vector2f(4),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.screen, new Vector2f(-64, 28), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
+		g.drawImage(Assets.screen, new Vector2f(0, 65), new Vector2f(128, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawImage(Assets.screen, new Vector2f(0, -65), new Vector2f(128, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+
+		g.drawImage(Assets.screen, new Vector2f(64, 45), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Oxygen", new Vector2f(64, 45), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+
+		g.drawImage(Assets.gaugeFace, new Vector2f(64, 20), new Vector2f(32), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawImage(Assets.needle, new Vector2f(64, 20), new Vector2f(32),
+				new Vector2f(DragonMath.percentToTheta((float) Math.ceil(sub.getOxygen())), 0),
+				new Color(255, 255, 255, 1));
+
+		g.drawImage(Assets.screen, new Vector2f(64, -10), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Power", new Vector2f(64, -10), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+
+		g.drawImage(Assets.gaugeFace, new Vector2f(64, -35), new Vector2f(32), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawImage(Assets.needle, new Vector2f(64, -35), new Vector2f(32),
+				new Vector2f(DragonMath.percentToTheta((float) Math.ceil(sub.getPower())), 0),
+				new Color(255, 255, 255, 1));
+
+		g.drawImage(Assets.screen, new Vector2f(-64, 45), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Lights", new Vector2f(-64, 45), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+
+		g.drawImage(Assets.screen, new Vector2f(-64, 28), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
 		g.drawString(Assets.font, (sub.isLights() ? "ON" : "OFF"), new Vector2f(-64, 28), new Vector2f(4),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.screen, new Vector2f(-64, -10), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, "Hull", new Vector2f(-64, -10), new Vector2f(4),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
-		g.drawImage(Assets.screen, new Vector2f(-64, -27), new Vector2f(32, 16), new Vector2f(0), new Color(255, 255, 255, 1));
-		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())), new Vector2f(-64, -27), new Vector2f(4),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
+
+		g.drawImage(Assets.screen, new Vector2f(-64, -10), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, "Hull", new Vector2f(-64, -10), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+
+		g.drawImage(Assets.screen, new Vector2f(-64, -27), new Vector2f(32, 16), new Vector2f(0),
+				new Color(255, 255, 255, 1));
+		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())),
+				new Vector2f(-64, -27), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_CENTER);
+
 		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, (int) sub.getDepth() + " m" + " - " + biomes.get(map[(int)sub.getPosition().x][-1*(int)sub.getPosition().y]), new Vector2f(0, -64), new Vector2f(6),
-				new Color(200, 174, 146, 1), g.FONT_CENTER);
+		g.drawString(Assets.font,
+				(int) sub.getDepth() + " m" + " - "
+						+ biomes.get(map[(int) sub.getPosition().x][-1 * (int) sub.getPosition().y]),
+				new Vector2f(0, -64), new Vector2f(6), new Color(200, 174, 146, 1), g.FONT_CENTER);
 	}
 
 	private void drawSonar() {
@@ -199,6 +255,22 @@ public class PlayState extends GameState {
 		for (AABB b : sonarBounds) {
 			g.drawImage(Assets.blank, b.getCenter().sub(sub.getPosition(), new Vector2f()).mul(2),
 					b.getScale().mul(2, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
+		}
+
+		if (Math.abs(sub.getPosition().x - closestStation.getPosition().x) > 20
+				|| Math.abs(sub.getPosition().y - closestStation.getPosition().y) > 20) {
+
+			double stationLoc = Math.atan((sub.getPosition().y - closestStation.getPosition().y)
+					/ (sub.getPosition().x - closestStation.getPosition().x));
+
+			g.drawImage(Assets.blank,
+					new Vector2f((float) (maxSonarScale / 2 * Math.cos(stationLoc)),
+							(float) (maxSonarScale / 2 * Math.sin(stationLoc))),
+					new Vector2f(2), new Vector2f(0), new Color(255, 0, 255, 1));
+		}
+
+		for (SupplyStation station : sonarStations) {
+			station.render(g, sub.getPosition(), sonarLight);
 		}
 	}
 
@@ -225,7 +297,7 @@ public class PlayState extends GameState {
 				new Color(255, 255, 255, sub.calculateLight()));
 		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
 	}
-	
+
 	public Submarine getSub() {
 		return sub;
 	}

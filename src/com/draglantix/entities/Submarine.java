@@ -81,7 +81,7 @@ public class Submarine {
 		}
 
 		if (moved) {
-			power -= .025f;
+			power -= .015f;
 		}		
 	}
 
@@ -202,6 +202,9 @@ public class Submarine {
 
 	public void setPower(float power) {
 		this.power = power;
+		if(this.power > 100) {
+			this.power = 100;
+		}
 	}
 
 	public float getOxygen() {
@@ -210,6 +213,9 @@ public class Submarine {
 
 	public void setOxygen(float oxygen) {
 		this.oxygen = oxygen;
+		if(this.oxygen > 100) {
+			this.oxygen = 100;
+		}
 	}
 
 	public boolean isAlive() {
