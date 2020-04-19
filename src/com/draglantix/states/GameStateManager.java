@@ -75,5 +75,18 @@ public class GameStateManager extends GSM {
 	public Submarine getSub() {
 		return playState.getSub();
 	}
+	
+	public void respawn() {
+		playState.respawn();
+		currentState = playState;
+	}
+	
+	public boolean respawnable() {
+		if(playState.respawnable()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }
