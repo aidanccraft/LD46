@@ -178,9 +178,8 @@ public class PlayState extends GameState {
 		
 		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, (int) sub.getDepth() + " m", new Vector2f(0, -64), new Vector2f(6),
+		g.drawString(Assets.font, (int) sub.getDepth() + " m" + " - " + biomes.get(map[(int)sub.getPosition().x][-1*(int)sub.getPosition().y]), new Vector2f(0, -64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		
 	}
 
 	private void drawSonar() {
