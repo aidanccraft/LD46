@@ -215,6 +215,7 @@ public class PlayState extends GameState {
 				Assets.submarineSFX2.play(Assets.subambient1);
 			}
 		}
+		
 	}
 
 	private void drawStats() {

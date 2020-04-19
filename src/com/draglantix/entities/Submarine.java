@@ -105,6 +105,10 @@ public class Submarine {
 					}
 
 					integrity -= this.velocity.length() * 50;
+					
+					Assets.submarineSFX3.setPosition(force.normalize(-1));
+					Assets.submarineSFX3.setVolume(50f * this.velocity.length());
+					Assets.submarineSFX3.play(Assets.collisionSFX);
 				}
 			}
 		}

@@ -43,9 +43,9 @@ public class Assets {
 	
 	public static Texture blank;
 	
-	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineEngine, sonarSFX;
+	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineSFX3, submarineEngine, sonarSFX;
 	
-	public static int sonarPing, subambient0, subambient1, subengine, waterambient;
+	public static int sonarPing, subambient0, subambient1, subengine, waterambient, collisionSFX;
 	
 	public static void init(Graphics g) {
 
@@ -95,18 +95,21 @@ public class Assets {
 		submarineSFX0 = new Source(1.5f, 1000, 0);
 		submarineSFX1 = new Source(1.5f, 1000, 0);
 		submarineSFX2 = new Source(1.5f, 1000, 0);
+		submarineSFX3 = new Source(1.5f, 1000, 0);
 		
 		sonarSFX.setPosition(new Vector2f(0, 0));
 		submarineEngine.setPosition(new Vector2f(0, 0));
 		submarineSFX0.setPosition(new Vector2f(0, 0));
 		submarineSFX1.setPosition(new Vector2f(0, 0));
 		submarineSFX2.setPosition(new Vector2f(0, 0));
+		submarineSFX3.setPosition(new Vector2f(0, 0));
 		
 		sonarPing = AudioMaster.loadSound("sfx/sonarPing.wav");
 		subambient0 = AudioMaster.loadSound("sfx/subambient0.wav");
 		subambient1 = AudioMaster.loadSound("sfx/subambient1.wav");
 		subengine = AudioMaster.loadSound("sfx/subengine.wav");
 		waterambient = AudioMaster.loadSound("sfx/waterambient.wav");
+		collisionSFX = AudioMaster.loadSound("sfx/collision.wav");
 		
 	}
 }
