@@ -13,10 +13,26 @@ public class SupplyStation {
 
 	private Vector2f position, scale;
 	private AABB bounds;
+	private int r, g, b;
+	private int stationType;
+	private boolean visited = false;
 
-	public SupplyStation(Vector2f position, Vector2f scale) {
+	public SupplyStation(Vector2f position, int stationType) {
 		this.position = position;
-		this.scale = scale;
+		this.stationType = stationType;
+		
+		if(this.stationType == 1) {
+			this.scale = new Vector2f(3);
+			this.r = 167;
+			this.g = 204;
+			this.b = 113;
+		} else if(this.stationType == 2) {
+			this.scale = new Vector2f(7);
+			this.r = 60;
+			this.g = 105;
+			this.b = 46;
+		}
+		
 		this.bounds = new AABB(position, scale, false);
 	}
 
@@ -28,12 +44,16 @@ public class SupplyStation {
 	public void checkCollision(Submarine sub) {
 		if (AABBCollider.collide(this.bounds, sub.bounds)) {
 			resupply(sub);
+			
+			if(this.stationType == 2) {
+				this.visited = true;
+			}
 		}
 	}
 
 	public void render(Graphics g, Vector2f subPos, float alpha) {
 		g.drawImage(Assets.blank, position.sub(subPos, new Vector2f()).mul(2), scale.mul(2, new Vector2f()),
-				new Vector2f(0), new Color(167, 204, 113, alpha));
+				new Vector2f(0), new Color(this.r, this.g, this.b, alpha));
 	}
 
 	public Vector2f getPosition() {
@@ -58,6 +78,22 @@ public class SupplyStation {
 
 	public void setBounds(AABB bounds) {
 		this.bounds = bounds;
+	}
+
+	public int getStationType() {
+		return stationType;
+	}
+
+	public void setStationType(int stationType) {
+		this.stationType = stationType;
+	}
+
+	public boolean isVisited() {
+		return visited;
+	}
+
+	public void setVisited(boolean visited) {
+		this.visited = visited;
 	}
 
 }

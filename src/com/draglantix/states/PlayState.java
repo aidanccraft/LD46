@@ -36,12 +36,16 @@ public class PlayState extends GameState {
 
 	private int[][] map;
 	private List<SupplyStation> supplyStations = new ArrayList<SupplyStation>();
-	private Vector2f[] supplyStationLocations = { new Vector2f(219, -140), new Vector2f(96, -274),
+	private Vector2f[] smallStationLocations = { new Vector2f(219, -140), new Vector2f(96, -274),
 			new Vector2f(255, -345), new Vector2f(273, -505), new Vector2f(245, -553), new Vector2f(346, -692),
 			new Vector2f(356, -503), new Vector2f(528, -466), new Vector2f(410, -317), new Vector2f(656, -352),
 			new Vector2f(356, -167), new Vector2f(271, -101) };
+	private Vector2f[] largeStationLocations = { new Vector2f(200, -376), new Vector2f(226, -741), new Vector2f(794, -442),
+			new Vector2f(623, -608) };
 
-	private SupplyStation closestStation;
+	private SupplyStation closestStation, nextStation;
+	
+	private SupplyStation respawn;
 
 	private Map<Integer, String> states = new HashMap<Integer, String>();
 	private int currentState;
@@ -73,7 +77,7 @@ public class PlayState extends GameState {
 		biomes.put(2, "Caves");
 		biomes.put(3, "Deep Caves");
 		biomes.put(4, "Open Ocean");
-		biomes.put(4, "Abyssal Zone");
+		biomes.put(5, "Abyssal Zone");
 
 		map = ImageDecoder.decode("res/textures/map.png");
 
@@ -88,11 +92,17 @@ public class PlayState extends GameState {
 			}
 		}
 
-		for (Vector2f loc : supplyStationLocations) {
-			supplyStations.add(new SupplyStation(loc, new Vector2f(3)));
+		for (Vector2f loc : smallStationLocations) {
+			supplyStations.add(new SupplyStation(loc, 1));
+		}
+		
+		for (Vector2f loc : largeStationLocations) {
+			supplyStations.add(new SupplyStation(loc, 2));
 		}
 
 		closestStation = supplyStations.get(0);
+		nextStation = supplyStations.get(12);
+		respawn = null;
 
 		Assets.submarineSFX0.setLooping(true);
 		Assets.submarineSFX0.play(Assets.waterambient);
@@ -100,7 +110,16 @@ public class PlayState extends GameState {
 		Assets.submarineSFX1.setLooping(true);
 		Assets.submarineSFX1.play(Assets.subengine);
 	}
-
+	
+	public void respawn() {
+		if(respawn != null) {
+			sub = new Submarine(new Vector2f(respawn.getPosition()), 0.2f);
+		} else {
+			sub = new Submarine(new Vector2f(33, -10), 0.2f);
+		}
+		currentState = 0;
+	}
+	
 	@Override
 	public void tick() {
 		handleSubstates();
@@ -141,6 +160,13 @@ public class PlayState extends GameState {
 					}
 				}
 
+				if(station.getStationType() == 1) {
+					if (station.getPosition().sub(sub.getPosition(), new Vector2f()).length() < closestStation.getPosition()
+							.sub(sub.getPosition(), new Vector2f()).length()) {
+						closestStation = station;
+					}
+				}
+
 			}
 
 		} else {
@@ -150,6 +176,11 @@ public class PlayState extends GameState {
 
 		for (SupplyStation station : supplyStations) {
 			station.checkCollision(sub);
+		}
+		
+		if(nextStation.isVisited()) {
+			respawn = nextStation;
+			nextStation = supplyStations.get(supplyStations.indexOf(nextStation) + 1);
 		}
 
 		if (!sub.isAlive()) {
@@ -301,9 +332,9 @@ public class PlayState extends GameState {
 
 			if (sub.getPosition().y - closestStation.getPosition().y > 0
 					&& sub.getPosition().x - closestStation.getPosition().x > 0) {
-				stationLoc += Math.PI;
+				stationLoc -= Math.PI;
 			}
-			
+
 			if (sub.getPosition().y - closestStation.getPosition().y < 0
 					&& sub.getPosition().x - closestStation.getPosition().x > 0) {
 				stationLoc += Math.PI;
@@ -313,6 +344,31 @@ public class PlayState extends GameState {
 					new Vector2f((float) (maxSonarScale / 2 * Math.cos(stationLoc)),
 							(float) (maxSonarScale / 2 * Math.sin(stationLoc))),
 					new Vector2f(2), new Vector2f(0), new Color(255, 0, 255, 1));
+		}
+		
+		if (Math.abs(sub.getPosition().x - nextStation.getPosition().x) > 20
+				|| Math.abs(sub.getPosition().y - nextStation.getPosition().y) > 20) {
+			double stationLoc = Math.atan((sub.getPosition().y - nextStation.getPosition().y)
+					/ (sub.getPosition().x - nextStation.getPosition().x));
+			
+			System.out.println("Station: " + nextStation.getPosition());
+			System.out.println("Sub: " + sub.getPosition());
+			
+			
+			if (sub.getPosition().y - nextStation.getPosition().y > 0
+					&& sub.getPosition().x - nextStation.getPosition().x > 0) {
+				stationLoc -= Math.PI;
+			}
+			
+			if (sub.getPosition().y - nextStation.getPosition().y < 0
+					&& sub.getPosition().x - nextStation.getPosition().x > 0) {
+				stationLoc += Math.PI;
+			}
+
+			g.drawImage(Assets.blank,
+					new Vector2f((float) (maxSonarScale / 2 * Math.cos(stationLoc)),
+							(float) (maxSonarScale / 2 * Math.sin(stationLoc))),
+					new Vector2f(2), new Vector2f(0), new Color(0, 255, 255, 1));
 		}
 
 		for (SupplyStation station : sonarStations) {
@@ -346,5 +402,13 @@ public class PlayState extends GameState {
 
 	public Submarine getSub() {
 		return sub;
+	}
+	
+	public boolean respawnable() {
+		if(respawn != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
