@@ -28,7 +28,7 @@ public class PlayState extends GameState {
 
 	private Submarine sub;
 
-	private Random rand = new Random();
+	private static Random rand = new Random();
 
 	private Vector3f ambientDir = new Vector3f(1, 0, 0);
 
@@ -50,6 +50,8 @@ public class PlayState extends GameState {
 
 	private Map<Integer, String> states = new HashMap<Integer, String>();
 	private int currentState;
+	
+	private static Map<Integer, Integer> events = new HashMap<Integer, Integer>();
 
 	private Map<Integer, String> biomes = new HashMap<Integer, String>();
 
@@ -76,6 +78,11 @@ public class PlayState extends GameState {
 		states.put(2, "WINDOW LEFT");
 		states.put(3, "WINDOW RIGHT");
 		states.put(4, "SONAR");
+		
+		events.put(0, 0); //Window, Event
+		events.put(1, 0);
+		events.put(2, 0);
+		events.put(3, 0);
 
 		biomes.put(0, "...");
 		biomes.put(1, "Shallows");
@@ -427,12 +434,33 @@ public class PlayState extends GameState {
 					new Color(255, 255, 255, 0.5f));
 		}
 		
-		g.drawImage(Assets.leechAnim.getTexture(), new Vector2f(0, 0), new Vector2f(50), new Vector2f(0),
-				new Color(255, 255, 255, 1));
-
+		drawWindowEvent(g);
+		
 		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.calculateLight()));
 		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
+	}
+	
+	private void drawWindowEvent(Graphics g) {
+		
+		int event = events.get(currentState);
+		
+		if(event == 1) {
+			g.drawImage(Assets.leechAnim.getTexture(), new Vector2f(0, 0), new Vector2f(50), new Vector2f(0),
+					new Color(255, 255, 255, 1));
+		}
+	}
+	
+	public static int eventOpenWindow(int event) {
+		List<Integer> open = new ArrayList<Integer>();
+		for(int i = 0; i < 3; i++) {
+			if(events.get(i) == 0) {
+				open.add(i);
+			}
+		}
+		int selection = rand.nextInt(open.size());
+		events.replace(selection, event);
+		return selection;
 	}
 
 	public Submarine getSub() {
