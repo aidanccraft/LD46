@@ -10,6 +10,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import com.draglantix.entities.Leader;
 import com.draglantix.entities.Leech;
 import com.draglantix.entities.SeaMonster;
 import com.draglantix.entities.Squid;
@@ -68,7 +69,7 @@ public class PlayState extends GameState {
 
 	private float lastWindowHeight;
 	
-	private static boolean endGame = false;
+	private static boolean endGame = false, gameFinishing = false;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
@@ -282,19 +283,22 @@ public class PlayState extends GameState {
 
 	private void handleCreatures() {
 		
-		if(!isEndGame() && spawnDelta > 5 && sea_monsters.size() < 4) {
+		if(!endGame && spawnDelta > 5 && sea_monsters.size() < 4) {
 			if(rand.nextInt(10) == 0) {
 				if(getBiome() == "Caves" || getBiome() == "Deep Caves") {
 					sea_monsters.add(new Leech(sub));
-					System.out.println("Added Leech!");
 				}else if(getBiome() == "Open Ocean" || getBiome() == "Abyssal Zone") {
 					sea_monsters.add(new Squid(sub));
-					System.out.println("Added Squid!");
 				}
 			}
 			spawnDelta = 0;
-		}else if(isEndGame()) {
-			System.out.println("End of game event.");
+		}else if(endGame) {
+			if(!gameFinishing) {
+				sea_monsters.removeAll(sea_monsters);
+				sea_monsters.add(new Leader(sub));
+				StationHandler.resetRespawn();
+				gameFinishing = true;
+			}
 		}
 		
 		for (int i = 0; i < sea_monsters.size(); i++) {
@@ -536,7 +540,7 @@ public class PlayState extends GameState {
 		return biomes.get(biome);
 	}
 
-	public boolean isEndGame() {
+	public static boolean isEndGame() {
 		return endGame;
 	}
 

@@ -30,11 +30,15 @@ public abstract class SeaMonster {
 	
 	protected int returnEvent;
 	
-	public SeaMonster(Submarine sub) {
+	public SeaMonster(Submarine sub, int type) {
 		this.sub = sub;
 		
 		this.theta = (float) (rand.nextFloat() * Math.PI * 2);
-		this.dis = rand.nextFloat() * 1 + 30f;
+		if(type == 1) {
+			this.dis = rand.nextFloat() * 1 + 30f;
+		} else {
+			this.dis = 0;
+		}
 		
 		float phi = (float) (rand.nextFloat() * Math.PI * 2);
 		
