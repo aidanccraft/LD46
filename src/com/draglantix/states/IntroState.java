@@ -19,9 +19,9 @@ public class IntroState extends GameState {
 			"Aquatical Life Corporations has hired you to discover the communication problem.", 
 			"Unfortunately, the only sub we have the funds for has... Uhhh... No Problems!",
 			"Anyways, get down there and keep the company alive!",
-			"Oh, and I suppose keep yourself alive! We wouldn't want any more lawsuits now would we!",
+			"Oh, and I suppose keep yourself alive! We wouldn`t want any more lawsuits now would we!",
 			"Use AWSD to move. Use Left and Right Arrows to switch view. Press and hold E in a Window to shine light."};
-
+	
 	public IntroState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
 	}
