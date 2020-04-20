@@ -11,10 +11,13 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import com.draglantix.entities.Leech;
+import com.draglantix.entities.SeaMonster;
+import com.draglantix.entities.Squid;
 import com.draglantix.entities.Submarine;
 import com.draglantix.flare.collision.AABB;
 import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
+import com.draglantix.flare.util.Timer;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
 import com.draglantix.terrain.StationHandler;
@@ -56,9 +59,12 @@ public class PlayState extends GameState {
 	private List<AABB> sonarBounds = new ArrayList<AABB>();
 	private List<SupplyStation> sonarStations = new ArrayList<SupplyStation>();
 
-	private List<Leech> leeches = new ArrayList<Leech>();
+	private List<SeaMonster> sea_monsters = new ArrayList<SeaMonster>();
 
 	private QuadTree qt;
+	
+	private Timer spawnTimer;
+	private double spawnDelta = 0f;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
@@ -112,6 +118,8 @@ public class PlayState extends GameState {
 
 		Assets.submarineSFX1.setLooping(true);
 		Assets.submarineSFX1.play(Assets.subengine);
+		
+		spawnTimer = new Timer();
 	}
 
 	public void respawn() {
@@ -125,6 +133,7 @@ public class PlayState extends GameState {
 
 	@Override
 	public void tick() {
+		
 		handleSubstates();
 
 		handleAudio();
@@ -162,7 +171,7 @@ public class PlayState extends GameState {
 
 			if (!sub.isAlive()) {
 				fadeAllSources();
-				leeches.removeAll(leeches);
+				sea_monsters.removeAll(sea_monsters);
 				gsm.setState(States.GAMEOVER);
 			}
 		} else {
@@ -176,6 +185,7 @@ public class PlayState extends GameState {
 		
 		phaseEvents();
 
+		spawnDelta += spawnTimer.getDelta();
 	}
 
 	@Override
@@ -250,16 +260,27 @@ public class PlayState extends GameState {
 	}
 
 	private void handleCreatures() {
-		if (leeches.size() < 1) {
-			leeches.add(new Leech(sub));
-			System.out.println("ADDED LEECH");
+		
+		System.out.println(spawnDelta);
+		
+		if(spawnDelta > 5 && sea_monsters.size() < 4) {
+			if(rand.nextInt(10) == 0) {
+				if(getBiome() == "Caves" || getBiome() == "Deep Caves") {
+					sea_monsters.add(new Leech(sub));
+					System.out.println("Added Leech!");
+				}else if(getBiome() == "Open Ocean" || getBiome() == "Abyssal Zone") {
+					sea_monsters.add(new Squid(sub));
+					System.out.println("Added Squid!");
+				}
+			}
+			spawnDelta = 0;
 		}
-
-		for (int i = 0; i < leeches.size(); i++) {
-			Leech l = leeches.get(i);
-			l.update();
-			if(l.dead) {
-				leeches.remove(l);
+		
+		for (int i = 0; i < sea_monsters.size(); i++) {
+			SeaMonster m = sea_monsters.get(i);
+			m.tick();
+			if(m.isDead()) {
+				sea_monsters.remove(m);
 			}
 		}
 	}
@@ -315,8 +336,7 @@ public class PlayState extends GameState {
 		g.drawString(Assets.font, states.get(getCurrentState()), new Vector2f(0, 64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
 		g.drawString(Assets.font,
-				(int) sub.getDepth() + " m" + " - "
-						+ biomes.get(map[(int) sub.getPosition().x][-1 * (int) sub.getPosition().y]),
+				(int) sub.getDepth() + " m" + " - " + getBiome(),
 				new Vector2f(0, -64), new Vector2f(6), new Color(200, 174, 146, 1), g.FONT_CENTER);
 	}
 
@@ -345,8 +365,8 @@ public class PlayState extends GameState {
 			station.render(g, sub.getPosition(), sonarLight);
 		}
 
-		for (Leech l : leeches) {
-			l.render(g, 20 * (sonarScale / maxSonarScale), sonarLight);
+		for (SeaMonster m : sea_monsters) {
+			m.render(g, 20 * (sonarScale / maxSonarScale), sonarLight);
 		}
 	}
 
@@ -382,6 +402,9 @@ public class PlayState extends GameState {
 		
 		if(event == 1) {
 			g.drawImage(Assets.leechAnim.getTexture(), new Vector2f(0, 0), new Vector2f(50), new Vector2f(0),
+					new Color(255, 255, 255, eventAlpha[getCurrentState()]));
+		}else if(event == 2) {
+			g.drawImage(Assets.squidAnim.getTexture(), new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 					new Color(255, 255, 255, eventAlpha[getCurrentState()]));
 		}
 	}
@@ -423,6 +446,10 @@ public class PlayState extends GameState {
 			}
 		}
 	}
+	
+	private String getBiome() {
+		return biomes.get(map[(int) sub.getPosition().x][-1 * (int) sub.getPosition().y]);
+	}
 
 	private void drawStation() {
 		g.drawMode(g.DRAW_SCREEN);
@@ -455,8 +482,8 @@ public class PlayState extends GameState {
 		Assets.sonarSFX.setVolume(0);
 		Assets.submarineEngine.setVolume(0);
 
-		for (Leech l : leeches) {
-			l.fadeSFX(0);
+		for (SeaMonster m : sea_monsters) {
+			m.fadeSFX(0);
 		}
 
 		Assets.music.setVolume(1);
@@ -475,8 +502,8 @@ public class PlayState extends GameState {
 		Assets.submarineSFX3.setVolume(1);
 		Assets.sonarSFX.setVolume(1);
 		Assets.submarineEngine.setVolume(1);
-		for(Leech l : leeches) {
-			l.resumeSFX();
+		for (SeaMonster m : sea_monsters) {
+			m.resumeSFX();
 		}
 	}
 

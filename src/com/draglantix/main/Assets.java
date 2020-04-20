@@ -44,6 +44,8 @@ public class Assets {
 	
 	public static SpriteSheet leech;
 	public static Animation leechAnim;
+	public static SpriteSheet squid;
+	public static Animation squidAnim;
 	
 	public static Texture blank;
 	
@@ -101,6 +103,9 @@ public class Assets {
 		
 		leech = new SpriteSheet("textures/leech.png");
 		leechAnim = new Animation(2, 2, 64, 7, leech, 0, 2, true);
+	
+		squid = new SpriteSheet("textures/squid.png");
+		squidAnim = new Animation(2, 2, 64, 7, squid, 0, 2, true);
 		
 		blank = new Texture("textures/blank.png");
 		

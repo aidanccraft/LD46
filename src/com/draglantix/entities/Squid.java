@@ -6,16 +6,16 @@ import org.joml.Vector3f;
 import com.draglantix.main.Assets;
 import com.draglantix.states.PlayState;
 
-public class Leech extends SeaMonster{
+public class Squid extends SeaMonster{
 
-	public Leech(Submarine sub) {
+	public Squid(Submarine sub) {
 		super(sub);
 		
 		sfx0.play(Assets.leechHunting);
 		sfx1.setPosition(new Vector2f(0));
 		sfx1.setLooping(true);
 	}
-	
+
 	@Override
 	public void tick() {
 		if(behaviorState == 0) {//Hunting
@@ -26,7 +26,7 @@ public class Leech extends SeaMonster{
 				sfx0.setPosition3D(new Vector3f(0));
 				sfx0.play(Assets.collisionSFX);
 				sfx1.play(Assets.alarm);
-				returnEvent = PlayState.eventOpenWindow(1);
+				returnEvent = PlayState.eventOpenWindow(2);
 			}
 		}else if(behaviorState == 1) {// Attacking
 			if(!sfx0.isPlaying()) {
@@ -55,5 +55,5 @@ public class Leech extends SeaMonster{
 			}
 		}
 	}
-	
+
 }
