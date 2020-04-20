@@ -51,6 +51,8 @@ public class Assets {
 	
 	public static Texture blank;
 	
+	public static Texture title;
+	
 	public static Source music;
 	
 	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineSFX3, submarineEngine, sonarSFX;
@@ -116,6 +118,8 @@ public class Assets {
 		minMap4 = new Texture("textures/minMap/minMap4.png");
 		
 		blank = new Texture("textures/blank.png");
+		
+		title = new Texture("textures/title.png");
 		
 		music = new Source(1.5f, 1000, 0);
 		

@@ -161,9 +161,9 @@ public class MenuState extends GameState {
 	@Override
 	public void render() {
 		if (currentSection == MenuSection.MAIN) {
-			g.drawString(Assets.font, "LD46",
-					new Vector2f((-screenWidth / 2) + (offset * .8f), (screenHeight / 2) - offset),
-					new Vector2f(screenHeight / 10), new Color(255, 255, 255, alpha), g.FONT_LEFT);
+			
+			g.drawImage(Assets.title, new Vector2f(0, screenHeight / 4),
+					new Vector2f(screenHeight/1, screenHeight /2), new Vector2f(0), new Color(255, 255, 255, alpha));
 		}
 
 		for (int i = 0; i < currentSection.getList().length; i++) {
@@ -182,6 +182,6 @@ public class MenuState extends GameState {
 			theta = 0;
 		}
 		
-		g.drawImage(Assets.submarine, new Vector2f((screenWidth / 4) + (float)(2 * Math.cos(theta + (Math.PI/2))), (float)(4 * Math.sin(theta))), new Vector2f(screenHeight/5), new Vector2f(0), new Color(255, 255, 255, alpha));
+		g.drawImage(Assets.submarine, new Vector2f((screenWidth / 4) + (float)(2 * Math.cos(theta + (Math.PI/2))), (-screenHeight/8) + (float)(4 * Math.sin(theta))), new Vector2f(screenHeight/5), new Vector2f(0), new Color(255, 255, 255, alpha));
 	}
 }
