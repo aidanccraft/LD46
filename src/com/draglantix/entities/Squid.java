@@ -9,7 +9,7 @@ import com.draglantix.states.PlayState;
 public class Squid extends SeaMonster{
 
 	public Squid(Submarine sub) {
-		super(sub);
+		super(sub, 1);
 		
 		sfx0.play(Assets.leechHunting);
 		sfx1.setPosition(new Vector2f(0));

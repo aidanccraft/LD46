@@ -6,10 +6,10 @@ import org.joml.Vector3f;
 import com.draglantix.main.Assets;
 import com.draglantix.states.PlayState;
 
-public class Leech extends SeaMonster{
+public class Leader extends SeaMonster{
 
-	public Leech(Submarine sub) {
-		super(sub, 1);
+	public Leader(Submarine sub) {
+		super(sub, 2);
 		
 		sfx0.play(Assets.leechHunting);
 		sfx1.setPosition(new Vector2f(0));
@@ -34,25 +34,8 @@ public class Leech extends SeaMonster{
 				sfx0.play(Assets.windowbreaking);
 			}
 			
-			if(sub.isLights() && PlayState.getCurrentState() == returnEvent) {
-				health -= 1f;
-			}
-			
-			if(health == 0) {
-				sfx0.setVolume(0f);
-				sfx1.setVolume(0f);
-				behaviorState = 3;
-			}
-			
-			sub.setOxygen(sub.getOxygen() - 0.03f);
+			sub.setOxygen(sub.getOxygen() - 0.3f);
 			this.position = sub.getPosition();
-		}else { // Swim Away
-			PlayState.resetEvent(returnEvent);
-			this.target = new Vector2f((float) (50 * Math.cos(theta)), (float) (50 * Math.sin(theta)));
-			position.lerp(new Vector2f(target), 0.007f);
-			if(getRadialDistance() > 40) {
-				dead = true;
-			}
 		}
 	}
 	

@@ -11,7 +11,7 @@ import com.draglantix.main.Assets;
 
 public class GameOverState extends GameState {
 
-	private String deathMessage, respawnMessage;
+	private String deathMessage, respawnMessage, winMessage;
 	private String exitMessage = "Press Enter to go to the menu";
 
 	public GameOverState(Graphics g, GameStateManager gsm) {
@@ -21,7 +21,10 @@ public class GameOverState extends GameState {
 	public void init() {
 		Submarine sub = gsm.getSub();
 		
-		if(sub.getIntegrity() <= 0) {
+		if(PlayState.isEndGame()) {
+			deathMessage = "The creatures of the abyss will never be defeated by humans!";
+			winMessage = "Congratulations, you beat the game!";
+		} else if(sub.getIntegrity() <= 0) {
 			deathMessage = "Your submarine exploded!";
 		} else if(sub.getOxygen() <= 0) {
 			deathMessage = "You ran out of oxygen!";
@@ -52,10 +55,14 @@ public class GameOverState extends GameState {
 	public void render() {
 		g.drawMode(g.DRAW_SCREEN);
 		g.drawString(Assets.font, deathMessage, new Vector2f(0, Window.getWidth() / 250f * 1.5f), new Vector2f(Window.getWidth() / 250f),
+				new Color(255, 100, 100, 1), g.FONT_CENTER);
+		if(winMessage != null) {
+			g.drawString(Assets.font, winMessage, new Vector2f(0, 0), new Vector2f(Window.getWidth() / 250f),
+					new Color(150, 255, 150, 1), g.FONT_CENTER);
+		}
+		g.drawString(Assets.font, respawnMessage, new Vector2f(0, -Window.getWidth() / 250f * 3f), new Vector2f(Window.getWidth() / 250f),
 				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, respawnMessage, new Vector2f(0, 0), new Vector2f(Window.getWidth() / 250f),
-				new Color(255, 255, 255, 1), g.FONT_CENTER);
-		g.drawString(Assets.font, exitMessage, new Vector2f(0, -Window.getWidth() / 250f * 1.5f), new Vector2f(Window.getWidth() / 250f),
+		g.drawString(Assets.font, exitMessage, new Vector2f(0, -Window.getWidth() / 250f * 4.5f), new Vector2f(Window.getWidth() / 250f),
 				new Color(255, 255, 255, 1), g.FONT_CENTER);
 	}
 }
