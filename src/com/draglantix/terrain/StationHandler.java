@@ -20,6 +20,7 @@ public class StationHandler {
 			new Vector2f(356, -167), new Vector2f(271, -101) };
 	private static Vector2f[] largeStationLocations = { new Vector2f(36, -37), new Vector2f(226, -741),
 			new Vector2f(794, -442), new Vector2f(623, -608) };
+	//The actual location of the first large station is (200, -376)
 
 	private static SupplyStation closestStation, nextStation, respawn;
 
