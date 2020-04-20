@@ -404,7 +404,7 @@ public class PlayState extends GameState {
 		for(int i = 0; i < 3; i++) {
 			if(events.get(i) != nextEvents.get(i)) {
 				if(eventIn[i]) {
-					eventAlpha[i]+= 0.01f;
+					eventAlpha[i]+= 0.1f;
 					if(eventAlpha[i] > 1) {
 						eventAlpha[i] = 1;
 						eventIn[i] = false;
