@@ -18,16 +18,15 @@ public class StationHandler {
 			new Vector2f(255, -345), new Vector2f(273, -505), new Vector2f(245, -553), new Vector2f(346, -692),
 			new Vector2f(356, -503), new Vector2f(528, -466), new Vector2f(410, -317), new Vector2f(656, -352),
 			new Vector2f(356, -167), new Vector2f(271, -101) };
-	private static Vector2f[] largeStationLocations = { new Vector2f(36, -37), new Vector2f(226, -741),
+	private static Vector2f[] largeStationLocations = { new Vector2f(133, -85), new Vector2f(200, -376), new Vector2f(226, -741),
 			new Vector2f(794, -442), new Vector2f(623, -608) };
-	//The actual location of the first large station is (200, -376)
 
 	private static SupplyStation closestStation, nextStation, respawn;
 
-	private static String[] messages;
+	private static String[] stationLogs;
 	
 	public static void init() {
-		messages = Assets.stationText.split("\n");
+		stationLogs = Assets.stationText.split("\n# ");
 		
 		for (Vector2f loc : smallStationLocations) {
 			supplyStations.add(new SupplyStation(loc, 1));
@@ -36,8 +35,12 @@ public class StationHandler {
 		int index = 0;
 		for (Vector2f loc : largeStationLocations) {
 			SupplyStation station = new SupplyStation(loc, 2);
-			station.setMessage(messages[index]);
+			
+			station.setLogs(stationLogs[index]);
+			station.setBiome(index + 1);
+			
 			supplyStations.add(station);
+			
 			index++;
 		}
 
@@ -71,6 +74,10 @@ public class StationHandler {
 		}
 		
 		return sonarStations;
+	}
+	
+	public static void tick() {
+		respawn.tick();
 	}
 	
 	public static void checkCollisions(Submarine sub, PlayState state) {
@@ -129,8 +136,8 @@ public class StationHandler {
 		}
 	}
 	
-	public static void renderText(Graphics g) {
-		respawn.renderText(g);
+	public static void renderText(Graphics g, PlayState state) {
+		respawn.renderScreen(g, state);
 	}
 	
 	public static SupplyStation getRespawn() {

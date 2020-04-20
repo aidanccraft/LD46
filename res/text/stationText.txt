@@ -1,5 +1,12 @@
-Beware the leeches... This is a line test to see if a new line is made when I add too much text or if everything I did doesn't work at all!
-This is a test!
-Helloooooooooo
-I need more text
-AHHHHHHHHHHHHHHH
+# - The toilet has been acting up lately, but otherwise the station is completely functional. On a stranger note, stations in the cave networks have been detecting unknown lifeforms recently.
+- Based on the small amount of data we have been able to gain, they seem to avoid light. All company employees have been issued flashlights. Probably just some faulty sensors like last time.
+# - These giant leeches have overrun this place! Almost all of our subs have been eaten through. The entire crew on this station is going to seek refuge in the deep caves. 
+- Hopefully we can sleep through a night without fighting off these monsters.
+# - We are going to have to abandon the caves. The oxygen reserves are low and if another leech eats through the hull we are doomed. 
+- The open ocean station stopped responding to us six days ago, but it's the best option we have. Who knows what happened to them.
+# - We should have gone straight for the surface. Staying down here was a mistake. The Open Ocean Station is barely functioning and won't survive another attack from that giant squid. 
+- The leeches were better. At least we could scare them off. Even worse, the Abyssal Zone station told us they picked up something even larger moving below them.
+- We have decided to make for the surface in the morning. The Abyssal Zone crew will have to make it up without our help.
+# - The other crews abandoned us yesterday. We do not have the supplies to make it to the surface so we will continue monitoring the colossal lifeform we detected two weeks ago. 
+- It seems to have some sort of relationship with the other Abyssal lifeforms, which could explain the behavior of the giant leeches and squids. 
+- We will use the last of the oxygen tomorrow to make an expedition down to the creature. Observing this first hand is our only option.

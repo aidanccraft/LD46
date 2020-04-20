@@ -115,8 +115,6 @@ public class Leech {
 		
 		this.position = new Vector2f((float) (target.x + (dis * Math.cos(theta))),
 				(float) (target.y + dis * Math.sin(theta)));
-		
-		System.out.println(getRadialDistance());
 	}
 	
 	public void render(Graphics g, float sonarRadius, float alpha) {
