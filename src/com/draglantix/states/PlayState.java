@@ -68,13 +68,22 @@ public class PlayState extends GameState {
 
 	private float lastWindowHeight;
 	
-	private static boolean endGame = false;
+	private static boolean miniMenu, endGame;
+	
+	private int miniMenuSelection;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
 	}
 
 	public void init() {
+		
+		resumeAllSources();
+		
+		miniMenu = false;
+		endGame = false;
+		
+		miniMenuSelection = 0;
 		
 		sub = new Submarine(new Vector2f(623, -598), .2f);//new Vector2f(33, -10), 0.2f);
 		currentState = 0;
@@ -147,9 +156,58 @@ public class PlayState extends GameState {
 	@Override
 	public void tick() {
 		
-		handleSubstates();
+		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+			if(miniMenu) {
+				resumeAllSources();
+				miniMenu = false;
+			}else {
+				fadeAllSources();
+				miniMenu = true;
+			}
+			
+			miniMenuSelection = 0;
+		}
+		
+		if(miniMenu) {
+			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_S) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_DOWN)) {
+				miniMenuSelection ++;
+			}
+			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_W) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_UP)) {
+				miniMenuSelection --;
+			}
+			
+			if(miniMenuSelection > 2) {
+				miniMenuSelection = 0;
+			}
+			
+			if(miniMenuSelection < 0) {
+				miniMenuSelection = 2;
+			}
+			
+			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+				switch(miniMenuSelection) {
+					
+					case 0:
+						miniMenu = false;
+						break;
+					case 1:
+						gsm.setState(States.MENU);
+						break;
+					case 2:
+						Window.close();
+						break;
+					default:
+						break;
+				
+				}
+			}
+			
+			return;	
+		}
 
 		handleAudio();
+		
+		handleSubstates();
 
 		if (getCurrentState() != switchableStates + 1) {
 			sonarScale += .5f;
@@ -228,6 +286,18 @@ public class PlayState extends GameState {
 		drawStats();
 		
 		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth() / g.getScale() / 0.7f, Window.getHeight() / g.getScale() / 0.7f), new Vector2f(0), new Color(100, 85, 76, 1));
+
+		if(miniMenu) {
+			g.drawImage(Assets.screen, new Vector2f(0), new Vector2f(100, 64), new Vector2f(0), new Color(255, 255, 255, 1));
+			
+			g.drawString(Assets.font, "Paused", new Vector2f(0, 25), new Vector2f(6), new Color(200, 174, 146, 1), g.FONT_CENTER);
+			
+			g.drawString(Assets.font, "Resume", new Vector2f(-20, 10), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_LEFT);
+			g.drawString(Assets.font, "Quit to Menu", new Vector2f(-20, 0), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_LEFT);
+			g.drawString(Assets.font, "Quit", new Vector2f(-20, -10), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_LEFT);
+			
+			g.drawImage(Assets.selector, new Vector2f(-30, 10 - (miniMenuSelection * 10)), new Vector2f(4), new Vector2f(0), new Color(200, 174, 146, 1));
+		}
 	}
 
 	private void handleSubstates() {
