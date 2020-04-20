@@ -11,7 +11,7 @@ public class Leader extends SeaMonster{
 	public Leader(Submarine sub) {
 		super(sub, 2);
 		
-		sfx0.play(Assets.leechHunting);
+		sfx0.play(Assets.colossalHunting);
 		sfx1.setPosition(new Vector2f(0));
 		sfx1.setLooping(true);
 	}

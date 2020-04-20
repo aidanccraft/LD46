@@ -11,7 +11,7 @@ public class Squid extends SeaMonster{
 	public Squid(Submarine sub) {
 		super(sub, 1);
 		
-		sfx0.play(Assets.leechHunting);
+		sfx0.play(Assets.squidHunting);
 		sfx1.setPosition(new Vector2f(0));
 		sfx1.setLooping(true);
 	}

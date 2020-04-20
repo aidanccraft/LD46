@@ -63,7 +63,7 @@ public class Assets {
 	public static int abyssal;
 	
 	public static int sonarPing, subambient0, subambient1, subengine, waterambient, collisionSFX, leechHunting,
-						windowbreaking, alarm;
+						windowbreaking, alarm, light, squidHunting, colossalHunting;
 	
 	public static void init(Graphics g) {
 
@@ -154,6 +154,10 @@ public class Assets {
 		windowbreaking = AudioMaster.loadSound("sfx/windowbreaking.wav");
 		alarm = AudioMaster.loadSound("sfx/alarm.wav");
 		leechHunting = AudioMaster.loadSound("sfx/leechHunting.wav");
+		
+		light = AudioMaster.loadSound("sfx/light.wav");
+		squidHunting = AudioMaster.loadSound("sfx/squidHunting.wav");
+		colossalHunting = AudioMaster.loadSound("sfx/colossalHunting.wav");
 		
 		stationText = Reader.loadFileAsString("text/stationText.txt");
 	}
