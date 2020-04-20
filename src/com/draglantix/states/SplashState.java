@@ -32,7 +32,7 @@ public class SplashState extends GameState {
 		}
 		
 		if(alpha == 0 || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-			gsm.setState(States.MENU);
+			gsm.setState(States.INTRO);
 		}
 	}
 
