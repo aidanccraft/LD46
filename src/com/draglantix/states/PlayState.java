@@ -446,10 +446,6 @@ public class PlayState extends GameState {
 			}
 		}
 	}
-	
-	private String getBiome() {
-		return biomes.get(map[(int) sub.getPosition().x][-1 * (int) sub.getPosition().y]);
-	}
 
 	private void drawStation() {
 		g.drawMode(g.DRAW_SCREEN);
@@ -509,6 +505,10 @@ public class PlayState extends GameState {
 
 	public static int getCurrentState() {
 		return currentState;
+	}
+	
+	private String getBiome() {
+		return biomes.get(map[(int) sub.getPosition().x][-1 * (int) sub.getPosition().y]);
 	}
 	
 	public String getBiome(int biome) {

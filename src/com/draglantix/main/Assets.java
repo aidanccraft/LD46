@@ -47,6 +47,8 @@ public class Assets {
 	public static SpriteSheet squid;
 	public static Animation squidAnim;
 	
+	public static Texture minMap0, minMap1, minMap2, minMap3, minMap4;
+	
 	public static Texture blank;
 	
 	public static Source music;
@@ -106,6 +108,12 @@ public class Assets {
 	
 		squid = new SpriteSheet("textures/squid.png");
 		squidAnim = new Animation(2, 2, 64, 7, squid, 0, 2, true);
+		
+		minMap0 = new Texture("textures/minMap/minMap0.png");
+		minMap1 = new Texture("textures/minMap/minMap1.png");
+		minMap2 = new Texture("textures/minMap/minMap2.png");
+		minMap3 = new Texture("textures/minMap/minMap3.png");
+		minMap4 = new Texture("textures/minMap/minMap4.png");
 		
 		blank = new Texture("textures/blank.png");
 		

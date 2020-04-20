@@ -7,6 +7,7 @@ import com.draglantix.entities.Submarine;
 import com.draglantix.flare.collision.AABB;
 import com.draglantix.flare.collision.AABBCollider;
 import com.draglantix.flare.graphics.Graphics;
+import com.draglantix.flare.textures.Texture;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
@@ -105,8 +106,34 @@ public class SupplyStation {
 		} else {
 			g.drawString(Assets.font, "Map of " + state.getBiome(biome), new Vector2f(0, 40), new Vector2f(4), new Color(200, 174, 146, 1),
 					88, g.FONT_CENTER);
+			g.drawImage(getMinMap(biome), new Vector2f(0), new Vector2f(60), new Vector2f(0), new Color(255, 255, 255, 1));
+			
 			g.drawString(Assets.font, this.bottomMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
 					g.FONT_LEFT);
+		}
+	}
+	
+	private Texture getMinMap(int biome) {
+		switch(biome) {
+			
+			case 1:
+				return Assets.minMap0;
+			
+			case 2:
+				return Assets.minMap1;
+				
+			case 3:
+				return Assets.minMap2;
+				
+			case 4:
+				return Assets.minMap3;
+				
+			case 5:
+				return Assets.minMap4;
+			
+			default:
+				return null;
+		
 		}
 	}
 	
