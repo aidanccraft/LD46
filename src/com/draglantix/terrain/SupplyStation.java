@@ -138,8 +138,8 @@ public class SupplyStation {
 	}
 	
 	public void setLogs(String logs) {
-		this.logList = logs.split("\n- ");
-		this.logList[0] = this.logList[0].substring(4);
+		this.logList = logs.trim().split("\n- ");
+		this.logList[0] = this.logList[0].substring(2);
 	}
 
 	public Vector2f getPosition() {

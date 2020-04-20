@@ -27,6 +27,7 @@ public class StationHandler {
 	
 	public static void init() {
 		stationLogs = Assets.stationText.split("\n# ");
+		stationLogs[0] = stationLogs[0].substring(2);
 		
 		for (Vector2f loc : smallStationLocations) {
 			supplyStations.add(new SupplyStation(loc, 1));
