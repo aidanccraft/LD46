@@ -127,6 +127,12 @@ public class PlayState extends GameState {
 		spawnTimer = new Timer();
 		
 		lastWindowHeight = 600f;
+		
+		if(Window.getHeight() != lastWindowHeight) {
+			float winScale = Window.getHeight()/lastWindowHeight;
+			g.setScale(g.getScale() * winScale);
+			lastWindowHeight = Window.getHeight();
+		}
 	}
 
 	public void respawn() {
