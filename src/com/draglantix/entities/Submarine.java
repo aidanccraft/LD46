@@ -35,7 +35,7 @@ public class Submarine {
 		move();
 
 		if (lights) {
-			power -= .005f;
+			power -= .05f;
 		}
 
 		oxygen -= .0075f;
@@ -76,8 +76,10 @@ public class Submarine {
 			moved = true;
 		}
 		
-		if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_E)) {
-			lights = !lights;
+		if (Window.getInput().isKeyDown(GLFW.GLFW_KEY_E)) {
+			lights = true;
+		}else {
+			lights = false;
 		}
 
 		if (moved) {
