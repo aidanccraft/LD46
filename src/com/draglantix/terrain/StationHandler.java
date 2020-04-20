@@ -35,8 +35,8 @@ public class StationHandler {
 		int index = 0;
 		for (Vector2f loc : largeStationLocations) {
 			SupplyStation station = new SupplyStation(loc, 2);
-			
-			station.setLogs(stationLogs[index]);
+						station.setLogs(stationLogs[index]);
+
 			station.setBiome(index + 1);
 			
 			supplyStations.add(station);
