@@ -3,8 +3,8 @@
 # - [10/25/2X] These giant leeches have overrun this place! Almost all of our subs have been eaten through. The entire crew on this station is going to seek refuge in the deep caves. 
 - Hopefully we can sleep through a night without fighting off these monsters.
 # - [10/28/2X] We are going to have to abandon the caves. The oxygen reserves are low and if another leech eats through the hull we are doomed. 
-- The open ocean station stopped responding to us six days ago, but it's the best option we have. Who knows what happened to them.
-# - [10/31/2X] We should have gone straight for the surface. Staying down here was a mistake. The Open Ocean Station is barely functioning and won't survive another attack from that giant squid. 
+- The open ocean station stopped responding to us six days ago, but it`s the best option we have. Who knows what happened to them.
+# - [10/31/2X] We should have gone straight for the surface. Staying down here was a mistake. The Open Ocean Station is barely functioning and won`t survive another attack from that giant squid. 
 - The leeches were better. At least we could scare them off. Even worse, the Abyssal Zone station told us they picked up something even larger moving below them.
 - We have decided to make for the surface in the morning. The Abyssal Zone crew will have to make it up without our help.
 # - [11/03/2X] The other crews abandoned us yesterday. We do not have the supplies to make it to the surface so we will continue monitoring the colossal lifeform we detected two weeks ago.

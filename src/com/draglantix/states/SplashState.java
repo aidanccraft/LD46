@@ -17,7 +17,7 @@ public class SplashState extends GameState {
 	}
 	
 	public void init() {
-		Assets.music.setVolume(0.1f);
+		Assets.music.setVolume(0.2f);
 		Assets.music.play(Assets.abyssal);
 	}
 

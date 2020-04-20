@@ -626,7 +626,7 @@ public class PlayState extends GameState {
 			m.fadeSFX(0);
 		}
 
-		Assets.music.setVolume(1);
+		Assets.music.setVolume(0.2f);
 	}
 
 	private void resumeAllSources() {
