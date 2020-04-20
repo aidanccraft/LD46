@@ -7,7 +7,6 @@ import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
-import com.draglantix.main.Settings;
 
 public class MenuState extends GameState {
 
@@ -16,14 +15,10 @@ public class MenuState extends GameState {
 
 	private static float offset = Window.getHeight() / 50f;
 
-	private int settingsIndex;
-	
 	private float theta = 0;
 
 	public enum MenuSection {
-		MAIN((1 / 8), new String[] { "Start", "Options", "Quit" }),
-		OPTIONS((3 / 8), new String[] { "Debug: " + Settings.DEBUG, "Back" }),
-		SETBOOL((3 / 8), new String[] { "True", "False", "Cancel" });
+		MAIN((1 / 8), new String[] { "Start", "Quit" });
 
 		private float cursorOffset;
 		private String[] list;
@@ -39,8 +34,6 @@ public class MenuState extends GameState {
 
 		public void resetCursorOffset() {
 			MAIN.cursorOffset = (1 / 8);
-			OPTIONS.cursorOffset = (3 / 8);
-			SETBOOL.cursorOffset = (3 / 8);
 		}
 
 		public String[] getList() {
@@ -86,39 +79,10 @@ public class MenuState extends GameState {
 			case MAIN:
 				if (currentIndex == 0) {
 					gsm.setState(States.INTRO);
-				} else if (currentIndex == 1) {
-					currentSection = MenuSection.OPTIONS;
 				} else {
 					Window.close();
 				}
 				break;
-			case OPTIONS:
-				if (currentIndex == 0) {
-					settingsIndex = 0;
-					currentSection = MenuSection.SETBOOL;
-				} else {
-					currentSection = MenuSection.MAIN;
-				}
-				break;
-			case SETBOOL:
-				if (currentIndex == 0) {
-					switch (settingsIndex) {
-					case 0:
-						Settings.DEBUG = true;
-					default:
-						break;
-					}
-				} else if (currentIndex == 1) {
-					switch (settingsIndex) {
-					case 0:
-						Settings.DEBUG = false;
-					default:
-						break;
-					}
-				}
-				currentSection = MenuSection.OPTIONS;
-				MenuSection.OPTIONS.list = new String[] { "Debug: " + Settings.DEBUG, "Back" };
-
 			default:
 				break;
 			}
@@ -161,9 +125,9 @@ public class MenuState extends GameState {
 	@Override
 	public void render() {
 		if (currentSection == MenuSection.MAIN) {
-			
+
 			g.drawImage(Assets.title, new Vector2f(0, screenHeight / 4),
-					new Vector2f(screenHeight/1, screenHeight /2), new Vector2f(0), new Color(255, 255, 255, alpha));
+					new Vector2f(screenHeight / 1, screenHeight / 2), new Vector2f(0), new Color(255, 255, 255, alpha));
 		}
 
 		for (int i = 0; i < currentSection.getList().length; i++) {
@@ -176,12 +140,15 @@ public class MenuState extends GameState {
 				new Vector2f((-screenWidth / 2) + (offset * .8f),
 						currentSection.getCursorOffset(screenHeight) - (currentIndex * offset)),
 				new Vector2f(screenHeight / 30), new Vector2f(0, 0), new Color(255, 255, 255, alpha));
-		
+
 		theta += 0.01;
-		if(theta > Math.PI * 2) {
+		if (theta > Math.PI * 2) {
 			theta = 0;
 		}
-		
-		g.drawImage(Assets.submarine, new Vector2f((screenWidth / 4) + (float)(2 * Math.cos(theta + (Math.PI/2))), (-screenHeight/8) + (float)(4 * Math.sin(theta))), new Vector2f(screenHeight/5), new Vector2f(0), new Color(255, 255, 255, alpha));
+
+		g.drawImage(Assets.submarine,
+				new Vector2f((screenWidth / 4) + (float) (2 * Math.cos(theta + (Math.PI / 2))),
+						(-screenHeight / 8) + (float) (4 * Math.sin(theta))),
+				new Vector2f(screenHeight / 5), new Vector2f(0), new Color(255, 255, 255, alpha));
 	}
 }
