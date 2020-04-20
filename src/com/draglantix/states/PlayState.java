@@ -17,6 +17,7 @@ import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
+import com.draglantix.terrain.StationHandler;
 import com.draglantix.terrain.SupplyStation;
 import com.draglantix.terrain.Terrain;
 import com.draglantix.utils.DragonMath;
@@ -36,31 +37,21 @@ public class PlayState extends GameState {
 	private float maxSonarScale = 80;
 
 	private int[][] map;
-	private List<SupplyStation> supplyStations = new ArrayList<SupplyStation>();
-	private Vector2f[] smallStationLocations = { new Vector2f(219, -140), new Vector2f(96, -274),
-			new Vector2f(255, -345), new Vector2f(273, -505), new Vector2f(245, -553), new Vector2f(346, -692),
-			new Vector2f(356, -503), new Vector2f(528, -466), new Vector2f(410, -317), new Vector2f(656, -352),
-			new Vector2f(356, -167), new Vector2f(271, -101) };
-	private Vector2f[] largeStationLocations = { new Vector2f(200, -376), new Vector2f(226, -741), new Vector2f(794, -442),
-			new Vector2f(623, -608) };
-
-	private SupplyStation closestStation, nextStation;
-	
-	private SupplyStation respawn;
 
 	private Map<Integer, String> states = new HashMap<Integer, String>();
-	private int currentState;
+	private int currentState, previousState;
+	private int switchableStates = 4;
 
 	private Map<Integer, String> biomes = new HashMap<Integer, String>();
 
 	public static List<AABB> bounds = new ArrayList<AABB>();
 	private List<AABB> sonarBounds = new ArrayList<AABB>();
 	private List<SupplyStation> sonarStations = new ArrayList<SupplyStation>();
-	
+
 	private List<Leech> leeches = new ArrayList<Leech>();
 
 	private QuadTree qt;
-	
+
 	private float menuVolume = 0.1f;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
@@ -76,6 +67,7 @@ public class PlayState extends GameState {
 		states.put(2, "WINDOW LEFT");
 		states.put(3, "WINDOW RIGHT");
 		states.put(4, "SONAR");
+		states.put(5, "STATION");
 
 		biomes.put(0, "...");
 		biomes.put(1, "Shallows");
@@ -96,18 +88,8 @@ public class PlayState extends GameState {
 				}
 			}
 		}
-
-		for (Vector2f loc : smallStationLocations) {
-			supplyStations.add(new SupplyStation(loc, 1));
-		}
 		
-		for (Vector2f loc : largeStationLocations) {
-			supplyStations.add(new SupplyStation(loc, 2));
-		}
-
-		closestStation = supplyStations.get(0);
-		nextStation = supplyStations.get(12);
-		respawn = null;
+		StationHandler.init();
 
 		Assets.submarineSFX0.setLooping(true);
 		Assets.submarineSFX0.play(Assets.waterambient);
@@ -115,85 +97,63 @@ public class PlayState extends GameState {
 		Assets.submarineSFX1.setLooping(true);
 		Assets.submarineSFX1.play(Assets.subengine);
 	}
-	
+
 	public void respawn() {
-		if(respawn != null) {
-			sub = new Submarine(new Vector2f(respawn.getPosition()), 0.2f);
+		if (StationHandler.getRespawn() != null) {
+			sub = new Submarine(new Vector2f(StationHandler.getRespawn().getPosition()), 0.2f);
 		} else {
 			sub = new Submarine(new Vector2f(33, -10), 0.2f);
 		}
 		currentState = 0;
 	}
-	
+
 	@Override
 	public void tick() {
 		handleSubstates();
 
 		handleAudio();
 
-		sonarScale += .5f;
-		if (sonarScale > maxSonarScale) {
-			sonarScale = 0;
-			this.sonarBounds.removeAll(sonarBounds);
-			this.sonarStations.removeAll(sonarStations);
-		}
-
-		sub.update();
-
-		PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
-
-		if (currentState == 4) {
-			List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 20 * (sonarScale / maxSonarScale));
-			for (AABB t : tmpsonar) {
-				if (!this.sonarBounds.contains(t)) {
-					this.sonarBounds.add(t);
-				}
+		if (currentState != switchableStates + 1) {
+			sonarScale += .5f;
+			if (sonarScale > maxSonarScale) {
+				sonarScale = 0;
+				this.sonarBounds.removeAll(sonarBounds);
+				this.sonarStations.removeAll(sonarStations);
 			}
 
-			for (SupplyStation station : supplyStations) {
-				if (sub.getPosition().x + 20 * (sonarScale / maxSonarScale) > station.getPosition().x
-						- station.getScale().x / 2
-						&& sub.getPosition().x - 20 * (sonarScale / maxSonarScale) < station.getPosition().x
-								+ station.getScale().x / 2) {
-					if (sub.getPosition().y + 20 * (sonarScale / maxSonarScale) > station.getPosition().y
-							- station.getScale().y / 2
-							&& sub.getPosition().y - 20 * (sonarScale / maxSonarScale) < station.getPosition().y
-									+ station.getScale().y / 2) {
-						if (!this.sonarStations.contains(station)) {
-							this.sonarStations.add(station);
-						}
+			sub.update();
+
+			PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
+
+			if (currentState == 4) {
+				List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 20 * (sonarScale / maxSonarScale));
+				for (AABB t : tmpsonar) {
+					if (!this.sonarBounds.contains(t)) {
+						this.sonarBounds.add(t);
 					}
 				}
+				
+				this.sonarStations = StationHandler.checkSonar(sub, sonarScale / maxSonarScale, sonarStations);
 
-				if(station.getStationType() == 1) {
-					if (station.getPosition().sub(sub.getPosition(), new Vector2f()).length() < closestStation.getPosition()
-							.sub(sub.getPosition(), new Vector2f()).length()) {
-						closestStation = station;
-					}
-				}
-
+			} else {
+				this.sonarBounds.removeAll(sonarBounds);
+				this.sonarStations.removeAll(sonarStations);
 			}
 
+			handleCreatures();
+			
+			StationHandler.checkCollisions(sub, this);
+
+			if (!sub.isAlive()) {
+				fadeAllSources();
+				leeches.removeAll(leeches);
+				gsm.setState(States.GAMEOVER);
+			}
 		} else {
-			this.sonarBounds.removeAll(sonarBounds);
-			this.sonarStations.removeAll(sonarStations);
-		}
-		
-		handleCreatures();
-
-		for (SupplyStation station : supplyStations) {
-			station.checkCollision(sub);
-		}
-		
-		if(nextStation.isVisited()) {
-			respawn = nextStation;
-			nextStation = supplyStations.get(supplyStations.indexOf(nextStation) + 1);
-		}
-
-		if (!sub.isAlive()) {
-			fadeAllSources();
-			leeches.removeAll(leeches);
-			gsm.setState(States.GAMEOVER);
+			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
+				this.currentState = this.previousState;
+				resumeAllSources();
+			}
 		}
 
 	}
@@ -207,6 +167,8 @@ public class PlayState extends GameState {
 
 		if (currentState < 4) {
 			drawCamera();
+		} else if (currentState == 5) {
+			drawStation();
 		} else {
 			drawSonar();
 		}
@@ -218,61 +180,66 @@ public class PlayState extends GameState {
 	}
 
 	private void handleSubstates() {
-		if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
-			currentState++;
-			if (currentState > states.size() - 1) {
-				currentState = 0;
-			}
-		} else if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
-			currentState--;
-			if (currentState < 0) {
-				currentState = states.size() - 1;
+		if (currentState != 5) {
+			if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
+				currentState++;
+				if (currentState > switchableStates) {
+					currentState = 0;
+				}
+			} else if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
+				currentState--;
+				if (currentState < 0) {
+					currentState = switchableStates;
+				}
 			}
 		}
 	}
 
 	private void handleAudio() {
-		
-		if(Assets.music.isPlaying()) {
+
+		if (Assets.music.isPlaying()) {
 			menuVolume -= 0.0005f;
-			if(menuVolume < 0) {
+			if (menuVolume < 0) {
 				menuVolume = 0;
 			}
 			Assets.music.setVolume(menuVolume);
 		}
-		
-		if (sonarScale == 0) {
-			Assets.sonarSFX.play(Assets.sonarPing);
-		}
 
-		Assets.submarineSFX1.setVolume(6f * sub.getVelocity().length());
-
-		if (!Assets.submarineSFX2.isPlaying() && rand.nextInt(1000) > 990) {
-
-			float theta = (float) (rand.nextFloat() * 2 * Math.PI);
-			float phi = (float) (rand.nextFloat() * 2 * Math.PI);
-
-			ambientDir = new Vector3f((float) (Math.cos(theta) * ambientDir.x),
-					(float) (Math.sin(theta) * ambientDir.y), (float) (Math.cos(phi) * ambientDir.z));
-
-			Assets.submarineSFX2.setPosition3D(ambientDir);
-
-			if (rand.nextInt(10) > 5) {
-				Assets.submarineSFX2.play(Assets.subambient0);
-			} else {
-				Assets.submarineSFX2.play(Assets.subambient1);
+		if(currentState != 5) {
+			if (sonarScale == 0) {
+				Assets.sonarSFX.play(Assets.sonarPing);
 			}
+
+			Assets.submarineSFX1.setVolume(6f * sub.getVelocity().length());
+
+			if (!Assets.submarineSFX2.isPlaying() && rand.nextInt(1000) > 990) {
+
+				float theta = (float) (rand.nextFloat() * 2 * Math.PI);
+				float phi = (float) (rand.nextFloat() * 2 * Math.PI);
+
+				ambientDir = new Vector3f((float) (Math.cos(theta) * ambientDir.x),
+						(float) (Math.sin(theta) * ambientDir.y), (float) (Math.cos(phi) * ambientDir.z));
+
+				Assets.submarineSFX2.setPosition3D(ambientDir);
+
+				if (rand.nextInt(10) > 5) {
+					Assets.submarineSFX2.play(Assets.subambient0);
+				} else {
+					Assets.submarineSFX2.play(Assets.subambient1);
+				}
+			}
+		} else {
+			fadeAllSources();
 		}
-		
 	}
-	
+
 	private void handleCreatures() {
-		if(leeches.size() < 1) {
+		if (leeches.size() < 1) {
 			leeches.add(new Leech(sub));
 			System.out.println("ADDED LEECH");
 		}
-		
-		for(Leech l : leeches) {
+
+		for (Leech l : leeches) {
 			l.update();
 		}
 	}
@@ -352,58 +319,13 @@ public class PlayState extends GameState {
 					b.getScale().mul(2, new Vector2f()), new Vector2f(0, 0), new Color(128, 160, 128, sonarLight));
 		}
 
-		if (Math.abs(sub.getPosition().x - closestStation.getPosition().x) > 20
-				|| Math.abs(sub.getPosition().y - closestStation.getPosition().y) > 20) {
-
-			double stationLoc = Math.atan((sub.getPosition().y - closestStation.getPosition().y)
-					/ (sub.getPosition().x - closestStation.getPosition().x));
-
-			if (sub.getPosition().y - closestStation.getPosition().y > 0
-					&& sub.getPosition().x - closestStation.getPosition().x > 0) {
-				stationLoc -= Math.PI;
-			}
-
-			if (sub.getPosition().y - closestStation.getPosition().y < 0
-					&& sub.getPosition().x - closestStation.getPosition().x > 0) {
-				stationLoc += Math.PI;
-			}
-
-			g.drawImage(Assets.blank,
-					new Vector2f((float) (maxSonarScale / 2 * Math.cos(stationLoc)),
-							(float) (maxSonarScale / 2 * Math.sin(stationLoc))),
-					new Vector2f(2), new Vector2f(0), new Color(255, 0, 255, 1));
-		}
-		
-		if (Math.abs(sub.getPosition().x - nextStation.getPosition().x) > 20
-				|| Math.abs(sub.getPosition().y - nextStation.getPosition().y) > 20) {
-			double stationLoc = Math.atan((sub.getPosition().y - nextStation.getPosition().y)
-					/ (sub.getPosition().x - nextStation.getPosition().x));
-			
-//			System.out.println("Station: " + nextStation.getPosition());
-//			System.out.println("Sub: " + sub.getPosition());
-			
-			
-			if (sub.getPosition().y - nextStation.getPosition().y > 0
-					&& sub.getPosition().x - nextStation.getPosition().x > 0) {
-				stationLoc -= Math.PI;
-			}
-			
-			if (sub.getPosition().y - nextStation.getPosition().y < 0
-					&& sub.getPosition().x - nextStation.getPosition().x > 0) {
-				stationLoc += Math.PI;
-			}
-
-			g.drawImage(Assets.blank,
-					new Vector2f((float) (maxSonarScale / 2 * Math.cos(stationLoc)),
-							(float) (maxSonarScale / 2 * Math.sin(stationLoc))),
-					new Vector2f(2), new Vector2f(0), new Color(0, 255, 255, 1));
-		}
+		StationHandler.drawSonar(g, sub, maxSonarScale);
 
 		for (SupplyStation station : sonarStations) {
 			station.render(g, sub.getPosition(), sonarLight);
 		}
-		
-		for(Leech l : leeches) {
+
+		for (Leech l : leeches) {
 			l.render(g, 20 * (sonarScale / maxSonarScale), sonarLight);
 		}
 	}
@@ -426,7 +348,7 @@ public class PlayState extends GameState {
 			g.drawImage(Assets.bubbleAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
 		}
-		
+
 		g.drawImage(Assets.leechAnim.getTexture(), new Vector2f(0, 0), new Vector2f(50), new Vector2f(0),
 				new Color(255, 255, 255, 1));
 
@@ -435,31 +357,52 @@ public class PlayState extends GameState {
 		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
 	}
 
+	private void drawStation() {
+		g.drawMode(g.DRAW_SCREEN);
+		StationHandler.renderText(g);
+	}
+
 	public Submarine getSub() {
 		return sub;
 	}
-	
+
 	public boolean respawnable() {
-		if(respawn != null) {
+		if (StationHandler.getRespawn() != null) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
+	public void setState(int state) {
+		this.previousState = this.currentState;
+		this.currentState = state;
+	}
+
 	private void fadeAllSources() {
-	
+
 		Assets.submarineSFX0.setVolume(0);
 		Assets.submarineSFX1.setVolume(0);
 		Assets.submarineSFX2.setVolume(0);
 		Assets.submarineSFX3.setVolume(0);
 		Assets.sonarSFX.setVolume(0);
 		Assets.submarineEngine.setVolume(0);
-		
-		for(Leech l: leeches) {
+
+		for (Leech l : leeches) {
 			l.fadeSFX(0);
 		}
-		
+
 		Assets.music.setVolume(1);
+	}
+	
+	private void resumeAllSources() {
+		Assets.submarineSFX0.setLooping(true);
+		Assets.submarineSFX0.play(Assets.waterambient);
+
+		Assets.submarineSFX1.setLooping(true);
+		Assets.submarineSFX1.play(Assets.subengine);
+		for(Leech l : leeches) {
+			l.resumeSFX();
+		}
 	}
 }
