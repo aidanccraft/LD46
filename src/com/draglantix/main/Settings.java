@@ -5,7 +5,7 @@ import com.draglantix.states.States;
 public class Settings {
 
 	public static final double FPS_CAP = 60;
-	public static final String WINDOW_TITLE = "LD46";
+	public static final String WINDOW_TITLE = "Into the Abyss";
 	
 	//Changeable Settings
 	public static boolean DEBUG = true;
