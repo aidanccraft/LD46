@@ -7,7 +7,6 @@ import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
-import com.draglantix.main.Game;
 import com.draglantix.main.Settings;
 
 public class MenuState extends GameState {
@@ -18,6 +17,8 @@ public class MenuState extends GameState {
 	private static float offset = Window.getHeight() / 50f;
 
 	private int settingsIndex;
+	
+	private float theta = 0;
 
 	public enum MenuSection {
 		MAIN((1 / 8), new String[] { "Start", "Options", "Quit" }),
@@ -117,7 +118,6 @@ public class MenuState extends GameState {
 				}
 				currentSection = MenuSection.OPTIONS;
 				MenuSection.OPTIONS.list = new String[] { "Debug: " + Settings.DEBUG, "Back" };
-				Game.resetSettings();
 
 			default:
 				break;
@@ -176,5 +176,12 @@ public class MenuState extends GameState {
 				new Vector2f((-screenWidth / 2) + (offset * .8f),
 						currentSection.getCursorOffset(screenHeight) - (currentIndex * offset)),
 				new Vector2f(screenHeight / 30), new Vector2f(0, 0), new Color(255, 255, 255, alpha));
+		
+		theta += 0.01;
+		if(theta > Math.PI * 2) {
+			theta = 0;
+		}
+		
+		g.drawImage(Assets.submarine, new Vector2f((screenWidth / 4) + (float)(2 * Math.cos(theta + (Math.PI/2))), (float)(4 * Math.sin(theta))), new Vector2f(screenHeight/5), new Vector2f(0), new Color(255, 255, 255, alpha));
 	}
 }

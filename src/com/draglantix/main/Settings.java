@@ -10,6 +10,6 @@ public class Settings {
 	//Changeable Settings
 	public static boolean DEBUG = true;
 
-	public static final States START_STATE = States.MENU;
+	public static final States START_STATE = States.SPLASH;
 
 }

@@ -23,6 +23,8 @@ public class Assets {
 	
 	public static Texture selector;
 	
+	public static Texture submarine;
+	
 	public static Texture panel, screen, gaugeFace, needle;
 	
 	public static Texture sonarRing;
@@ -44,9 +46,14 @@ public class Assets {
 	
 	public static Texture blank;
 	
+	public static Source music;
+	
 	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineSFX3, submarineEngine, sonarSFX;
 	
-	public static int sonarPing, subambient0, subambient1, subengine, waterambient, collisionSFX;
+	public static int abyssal;
+	
+	public static int sonarPing, subambient0, subambient1, subengine, waterambient, collisionSFX, leechHunting,
+						windowbreaking, alarm;
 	
 	public static void init(Graphics g) {
 
@@ -61,6 +68,8 @@ public class Assets {
 		logoAnim = new Animation(3, 3, 64, 20, draglantix, 0, 9, false);
 		
 		selector = new Texture("textures/selector.png");
+		
+		submarine = new Texture("textures/submarine.png");
 		
 		panel = new Texture("textures/panel.png");
 		screen = new Texture("textures/screen.png");
@@ -92,12 +101,17 @@ public class Assets {
 		
 		blank = new Texture("textures/blank.png");
 		
+		music = new Source(1.5f, 1000, 0);
+		
 		sonarSFX = new Source(1.5f, 1000, 0);
 		submarineEngine = new Source(1.5f, 1000, 0);
 		submarineSFX0 = new Source(1.5f, 1000, 0);
 		submarineSFX1 = new Source(1.5f, 1000, 0);
 		submarineSFX2 = new Source(1.5f, 1000, 0);
 		submarineSFX3 = new Source(1.5f, 1000, 0);
+		
+		music.setPosition(new Vector2f(0, 0));
+		music.setLooping(true);
 		
 		sonarSFX.setPosition(new Vector2f(0, 0));
 		submarineEngine.setPosition(new Vector2f(0, 0));
@@ -106,12 +120,17 @@ public class Assets {
 		submarineSFX2.setPosition(new Vector2f(0, 0));
 		submarineSFX3.setPosition(new Vector2f(0, 0));
 		
+		abyssal = AudioMaster.loadSound("music/abyssal.wav");
+		
 		sonarPing = AudioMaster.loadSound("sfx/sonarPing.wav");
 		subambient0 = AudioMaster.loadSound("sfx/subambient0.wav");
 		subambient1 = AudioMaster.loadSound("sfx/subambient1.wav");
 		subengine = AudioMaster.loadSound("sfx/subengine.wav");
 		waterambient = AudioMaster.loadSound("sfx/waterambient.wav");
 		collisionSFX = AudioMaster.loadSound("sfx/collision.wav");
+		windowbreaking = AudioMaster.loadSound("sfx/windowbreaking.wav");
+		alarm = AudioMaster.loadSound("sfx/alarm.wav");
+		leechHunting = AudioMaster.loadSound("sfx/leechHunting.wav");
 		
 	}
 }

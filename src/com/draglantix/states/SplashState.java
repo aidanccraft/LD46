@@ -15,6 +15,11 @@ public class SplashState extends GameState {
 	public SplashState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
 	}
+	
+	public void init() {
+		Assets.music.setVolume(0.1f);
+		Assets.music.play(Assets.abyssal);
+	}
 
 	@Override
 	public void tick() {

@@ -10,6 +10,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import com.draglantix.entities.Leech;
 import com.draglantix.entities.Submarine;
 import com.draglantix.flare.collision.AABB;
 import com.draglantix.flare.graphics.Graphics;
@@ -55,8 +56,12 @@ public class PlayState extends GameState {
 	public static List<AABB> bounds = new ArrayList<AABB>();
 	private List<AABB> sonarBounds = new ArrayList<AABB>();
 	private List<SupplyStation> sonarStations = new ArrayList<SupplyStation>();
+	
+	private List<Leech> leeches = new ArrayList<Leech>();
 
 	private QuadTree qt;
+	
+	private float menuVolume = 0.1f;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
@@ -173,6 +178,8 @@ public class PlayState extends GameState {
 			this.sonarBounds.removeAll(sonarBounds);
 			this.sonarStations.removeAll(sonarStations);
 		}
+		
+		handleCreatures();
 
 		for (SupplyStation station : supplyStations) {
 			station.checkCollision(sub);
@@ -184,7 +191,8 @@ public class PlayState extends GameState {
 		}
 
 		if (!sub.isAlive()) {
-			Assets.submarineSFX1.setVolume(0f);
+			fadeAllSources();
+			leeches.removeAll(leeches);
 			gsm.setState(States.GAMEOVER);
 		}
 
@@ -224,6 +232,15 @@ public class PlayState extends GameState {
 	}
 
 	private void handleAudio() {
+		
+		if(Assets.music.isPlaying()) {
+			menuVolume -= 0.0005f;
+			if(menuVolume < 0) {
+				menuVolume = 0;
+			}
+			Assets.music.setVolume(menuVolume);
+		}
+		
 		if (sonarScale == 0) {
 			Assets.sonarSFX.play(Assets.sonarPing);
 		}
@@ -247,6 +264,17 @@ public class PlayState extends GameState {
 			}
 		}
 		
+	}
+	
+	private void handleCreatures() {
+		if(leeches.size() < 1) {
+			leeches.add(new Leech(sub));
+			System.out.println("ADDED LEECH");
+		}
+		
+		for(Leech l : leeches) {
+			l.update();
+		}
 	}
 
 	private void drawStats() {
@@ -351,8 +379,8 @@ public class PlayState extends GameState {
 			double stationLoc = Math.atan((sub.getPosition().y - nextStation.getPosition().y)
 					/ (sub.getPosition().x - nextStation.getPosition().x));
 			
-			System.out.println("Station: " + nextStation.getPosition());
-			System.out.println("Sub: " + sub.getPosition());
+//			System.out.println("Station: " + nextStation.getPosition());
+//			System.out.println("Sub: " + sub.getPosition());
 			
 			
 			if (sub.getPosition().y - nextStation.getPosition().y > 0
@@ -373,6 +401,10 @@ public class PlayState extends GameState {
 
 		for (SupplyStation station : sonarStations) {
 			station.render(g, sub.getPosition(), sonarLight);
+		}
+		
+		for(Leech l : leeches) {
+			l.render(g, 20 * (sonarScale / maxSonarScale), sonarLight);
 		}
 	}
 
@@ -413,5 +445,21 @@ public class PlayState extends GameState {
 		} else {
 			return false;
 		}
+	}
+	
+	private void fadeAllSources() {
+	
+		Assets.submarineSFX0.setVolume(0);
+		Assets.submarineSFX1.setVolume(0);
+		Assets.submarineSFX2.setVolume(0);
+		Assets.submarineSFX3.setVolume(0);
+		Assets.sonarSFX.setVolume(0);
+		Assets.submarineEngine.setVolume(0);
+		
+		for(Leech l: leeches) {
+			l.fadeSFX(0);
+		}
+		
+		Assets.music.setVolume(1);
 	}
 }

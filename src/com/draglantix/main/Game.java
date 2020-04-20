@@ -10,8 +10,4 @@ public class Game {
 		new FlareEngine(new GameStateManager(), Settings.FPS_CAP, 800, 600, Settings.WINDOW_TITLE, true, false, Settings.DEBUG);
 	}
 	
-	public static void resetSettings() {
-		
-	}
-
 }
