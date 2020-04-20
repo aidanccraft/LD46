@@ -25,9 +25,8 @@ public class SupplyStation {
 	
 	private String[] logList;
 	
-	private String bottomMessage1 = "Press D for next log";
-	private String bottomMessage2 = "Press A or D for logs";
-	private String bottomMessage3 = "Press Space to exit";
+	private String bottomMessage1 = "Use Arrows to navigate between logs";
+	private String bottomMessage2 = "Press Space to exit";
 	private String bottomMessage = bottomMessage1;
 	
 	private int currentScreen = 0;
@@ -75,20 +74,19 @@ public class SupplyStation {
 	}
 	
 	public void tick() {
-		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_A)) {
+		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
 			currentScreen--;
-		} else if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_D)) {
+		} else if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
 			currentScreen++;
 		}
 		
-		bottomMessage = bottomMessage2;
+		bottomMessage = bottomMessage1;
 		
 		if(currentScreen <= 0) {
 			currentScreen = 0;
-			bottomMessage = bottomMessage1;
 		} else if(currentScreen >= logList.length) {
 			currentScreen = logList.length;
-			bottomMessage = bottomMessage3;
+			bottomMessage = bottomMessage2;
 		}
 	}
 
@@ -101,15 +99,15 @@ public class SupplyStation {
 		if(currentScreen != logList.length) {
 			g.drawString(Assets.font, this.logList[currentScreen], new Vector2f(-44, 40), new Vector2f(4), new Color(200, 174, 146, 1),
 					88, g.FONT_LEFT);
-			g.drawString(Assets.font, this.bottomMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
-					g.FONT_LEFT);
+			g.drawString(Assets.font, this.bottomMessage, new Vector2f(-44, -34), new Vector2f(4), new Color(200, 174, 146, 1),
+					88, g.FONT_LEFT);
 		} else {
 			g.drawString(Assets.font, "Map of " + state.getBiome(biome), new Vector2f(0, 40), new Vector2f(4), new Color(200, 174, 146, 1),
 					88, g.FONT_CENTER);
 			g.drawImage(getMinMap(biome), new Vector2f(0), new Vector2f(60), new Vector2f(0), new Color(255, 255, 255, 1));
 			
 			g.drawString(Assets.font, this.bottomMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
-					g.FONT_LEFT);
+					88, g.FONT_LEFT);
 		}
 	}
 	

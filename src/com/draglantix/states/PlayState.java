@@ -168,19 +168,19 @@ public class PlayState extends GameState {
 	}
 
 	public void respawn() {
+		
 		if (StationHandler.getRespawn() != null) {
 			sub = new Submarine(new Vector2f(StationHandler.getRespawn().getPosition()), 0.2f);
-			previousState = 0;
 			resumeAllSources();
+			previousState = 0;
+			currentState = 0;
 		} else {
 			init();
 		}
-		currentState = 0;
 	}
 
 	@Override
 	public void tick() {
-
 		if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
 			if (miniMenu) {
 				resumeAllSources();
@@ -609,8 +609,8 @@ public class PlayState extends GameState {
 	}
 
 	public void setState(int state) {
-		this.previousState = getCurrentState();
-		PlayState.currentState = state;
+		this.previousState = currentState;
+		currentState = state;
 	}
 
 	private void fadeAllSources() {

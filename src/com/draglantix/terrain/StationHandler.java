@@ -13,7 +13,7 @@ import com.draglantix.states.PlayState;
 
 public class StationHandler {
 
-	private static List<SupplyStation> supplyStations = new ArrayList<SupplyStation>();
+	private static List<SupplyStation> supplyStations;
 	private static Vector2f[] smallStationLocations = { new Vector2f(219, -140), new Vector2f(96, -274),
 			new Vector2f(255, -345), new Vector2f(273, -505), new Vector2f(245, -553), new Vector2f(346, -692),
 			new Vector2f(356, -503), new Vector2f(528, -466), new Vector2f(410, -317), new Vector2f(656, -352),
@@ -26,6 +26,7 @@ public class StationHandler {
 	private static String[] stationLogs;
 
 	public static void init() {
+		supplyStations = new ArrayList<SupplyStation>();
 		stationLogs = Assets.stationText.split("\n# ");
 		stationLogs[0] = stationLogs[0].substring(2);
 
@@ -82,10 +83,11 @@ public class StationHandler {
 		for (SupplyStation station : supplyStations) {
 			station.checkCollision(sub, state);
 		}
-
+		
 		if (nextStation != null) {
 			if (nextStation.isVisited()) {
 				if (supplyStations.indexOf(nextStation) + 1 == supplyStations.size()) {
+					respawn = nextStation;
 					PlayState.setEndGame(true);
 					nextStation = null;
 				} else {
