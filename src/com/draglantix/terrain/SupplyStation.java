@@ -69,10 +69,10 @@ public class SupplyStation {
 	}
 	
 	public void renderText(Graphics g) {
-		g.drawString(Assets.font, this.message, new Vector2f(0, 40), new Vector2f(4), new Color(200, 174, 146, 1),
-				g.FONT_CENTER);
-		g.drawString(Assets.font, this.exitMessage, new Vector2f(0, -40), new Vector2f(4), new Color(200, 174, 146, 1),
-				g.FONT_CENTER);
+		g.drawString(Assets.font, this.message, new Vector2f(-44, 40), new Vector2f(4), new Color(200, 174, 146, 1),
+				88, g.FONT_LEFT);
+		g.drawString(Assets.font, this.exitMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_LEFT);
 	}
 	
 	public void setMessage(String message) {
