@@ -45,7 +45,8 @@ public class StationHandler {
 		}
 
 		closestStation = supplyStations.get(0);
-		nextStation = supplyStations.get(12);
+		nextStation = supplyStations.get(16);
+		respawn = supplyStations.get(15);
 	}
 	
 	public static List<SupplyStation> checkSonar(Submarine sub, float scale, List<SupplyStation> sonarStations) {
@@ -87,7 +88,11 @@ public class StationHandler {
 
 		if (nextStation.isVisited()) {
 			respawn = nextStation;
-			nextStation = supplyStations.get(supplyStations.indexOf(nextStation) + 1);
+			if(supplyStations.indexOf(nextStation) + 1 == supplyStations.size()) {
+				PlayState.setEndGame(true);
+			}else {
+				nextStation = supplyStations.get(supplyStations.indexOf(nextStation) + 1);
+			}
 		}
 	}
 	

@@ -66,12 +66,17 @@ public class PlayState extends GameState {
 	private Timer spawnTimer;
 	private double spawnDelta = 0f;
 
+	private float lastWindowHeight;
+	
+	private static boolean endGame = false;
+
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
 	}
 
 	public void init() {
-		sub = new Submarine(new Vector2f(33, -10), 0.2f);
+		
+		sub = new Submarine(new Vector2f(623, -598), .2f);//new Vector2f(33, -10), 0.2f);
 		currentState = 0;
 
 		states.put(0, "WINDOW DOWN");
@@ -120,6 +125,8 @@ public class PlayState extends GameState {
 		Assets.submarineSFX1.play(Assets.subengine);
 		
 		spawnTimer = new Timer();
+		
+		lastWindowHeight = 600f;
 	}
 
 	public void respawn() {
@@ -190,11 +197,20 @@ public class PlayState extends GameState {
 
 	@Override
 	public void render() {
-		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth() / 2, Window.getHeight() / 2),
+		
+		if(Window.hasResized()) {
+			float winScale = Window.getHeight()/lastWindowHeight;
+			g.setScale(g.getScale() * winScale);
+			lastWindowHeight = Window.getHeight();
+		}
+		
+		g.drawMode(g.DRAW_SCREEN);
+		
+		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth()/g.getScale(), Window.getHeight()/g.getScale()),
 				new Vector2f(0), new Color(100, 85, 76, 1));
 		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
-
+		
 		if (getCurrentState() < 4) {
 			drawCamera();
 		} else if (getCurrentState() == 5) {
@@ -204,9 +220,8 @@ public class PlayState extends GameState {
 		}
 
 		drawStats();
-
-		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth() / 2, Window.getHeight() / 2),
-				new Vector2f(0), new Color(100, 85, 76, 1));
+		
+		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth() / g.getScale() / 0.7f, Window.getHeight() / g.getScale() / 0.7f), new Vector2f(0), new Color(100, 85, 76, 1));
 	}
 
 	private void handleSubstates() {
@@ -261,9 +276,7 @@ public class PlayState extends GameState {
 
 	private void handleCreatures() {
 		
-		System.out.println(spawnDelta);
-		
-		if(spawnDelta > 5 && sea_monsters.size() < 4) {
+		if(!isEndGame() && spawnDelta > 5 && sea_monsters.size() < 4) {
 			if(rand.nextInt(10) == 0) {
 				if(getBiome() == "Caves" || getBiome() == "Deep Caves") {
 					sea_monsters.add(new Leech(sub));
@@ -274,6 +287,8 @@ public class PlayState extends GameState {
 				}
 			}
 			spawnDelta = 0;
+		}else if(isEndGame()) {
+			System.out.println("End of game event.");
 		}
 		
 		for (int i = 0; i < sea_monsters.size(); i++) {
@@ -513,5 +528,13 @@ public class PlayState extends GameState {
 	
 	public String getBiome(int biome) {
 		return biomes.get(biome);
+	}
+
+	public boolean isEndGame() {
+		return endGame;
+	}
+
+	public static void setEndGame(boolean endGame) {
+		PlayState.endGame = endGame;
 	}
 }
