@@ -41,8 +41,13 @@ public class PlayState extends GameState {
 	private Map<Integer, String> states = new HashMap<Integer, String>();
 
 	private static Map<Integer, Integer> events = new HashMap<Integer, Integer>();
+	private static Map<Integer, Integer> nextEvents = new HashMap<Integer, Integer>();
+	private float[] eventAlpha = new float[] {0f, 0f, 0f, 0f};
+	private boolean[] eventIn = new boolean[] {true, true, true, true};
 	
-	private int currentState, previousState;
+	private static int currentState;
+
+	private int previousState;
 	private int switchableStates = 4;
 
 	private Map<Integer, String> biomes = new HashMap<Integer, String>();
@@ -54,8 +59,6 @@ public class PlayState extends GameState {
 	private List<Leech> leeches = new ArrayList<Leech>();
 
 	private QuadTree qt;
-
-	private float menuVolume = 0.1f;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
 		super(g, gsm);
@@ -76,6 +79,11 @@ public class PlayState extends GameState {
 		events.put(1, 0);
 		events.put(2, 0);
 		events.put(3, 0);
+		
+		nextEvents.put(0, 0); //Window, Event
+		nextEvents.put(1, 0);
+		nextEvents.put(2, 0);
+		nextEvents.put(3, 0);
 
 		biomes.put(0, "...");
 		biomes.put(1, "Shallows");
@@ -121,7 +129,7 @@ public class PlayState extends GameState {
 
 		handleAudio();
 
-		if (currentState != switchableStates + 1) {
+		if (getCurrentState() != switchableStates + 1) {
 			sonarScale += .5f;
 			if (sonarScale > maxSonarScale) {
 				sonarScale = 0;
@@ -133,7 +141,7 @@ public class PlayState extends GameState {
 
 			PlayState.bounds = qt.query(new Quad(new Vector2f(sub.getPosition()), new Vector2f(5)));
 
-			if (currentState == 4) {
+			if (getCurrentState() == 4) {
 				List<AABB> tmpsonar = qt.query(new Vector2f(sub.getPosition()), 20 * (sonarScale / maxSonarScale));
 				for (AABB t : tmpsonar) {
 					if (!this.sonarBounds.contains(t)) {
@@ -159,10 +167,12 @@ public class PlayState extends GameState {
 			}
 		} else {
 			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-				this.currentState = this.previousState;
+				PlayState.currentState = this.previousState;
 				resumeAllSources();
 			}
 		}
+		
+		phaseEvents();
 
 	}
 
@@ -173,9 +183,9 @@ public class PlayState extends GameState {
 		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
 
-		if (currentState < 4) {
+		if (getCurrentState() < 4) {
 			drawCamera();
-		} else if (currentState == 5) {
+		} else if (getCurrentState() == 5) {
 			drawStation();
 		} else {
 			drawSonar();
@@ -188,15 +198,15 @@ public class PlayState extends GameState {
 	}
 
 	private void handleSubstates() {
-		if (currentState != 5) {
+		if (getCurrentState() != 5) {
 			if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_RIGHT)) {
-				currentState++;
-				if (currentState > switchableStates) {
+				currentState = getCurrentState() + 1;
+				if (getCurrentState() > switchableStates) {
 					currentState = 0;
 				}
 			} else if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_LEFT)) {
-				currentState--;
-				if (currentState < 0) {
+				currentState = getCurrentState() - 1;
+				if (getCurrentState() < 0) {
 					currentState = switchableStates;
 				}
 			}
@@ -206,14 +216,10 @@ public class PlayState extends GameState {
 	private void handleAudio() {
 
 		if (Assets.music.isPlaying()) {
-			menuVolume -= 0.0005f;
-			if (menuVolume < 0) {
-				menuVolume = 0;
-			}
-			Assets.music.setVolume(menuVolume);
+			Assets.music.setVolume(0);
 		}
 
-		if(currentState != 5) {
+		if(getCurrentState() != 5) {
 			if (sonarScale == 0) {
 				Assets.sonarSFX.play(Assets.sonarPing);
 			}
@@ -247,8 +253,12 @@ public class PlayState extends GameState {
 			System.out.println("ADDED LEECH");
 		}
 
-		for (Leech l : leeches) {
+		for (int i = 0; i < leeches.size(); i++) {
+			Leech l = leeches.get(i);
 			l.update();
+			if(l.dead) {
+				leeches.remove(l);
+			}
 		}
 	}
 
@@ -300,7 +310,7 @@ public class PlayState extends GameState {
 		g.drawString(Assets.font, DragonMath.evaluateIntegrity((int) Math.ceil(sub.getIntegrity())),
 				new Vector2f(-64, -27), new Vector2f(3), new Color(200, 174, 146, 1), g.FONT_CENTER);
 
-		g.drawString(Assets.font, states.get(currentState), new Vector2f(0, 64), new Vector2f(6),
+		g.drawString(Assets.font, states.get(getCurrentState()), new Vector2f(0, 64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
 		g.drawString(Assets.font,
 				(int) sub.getDepth() + " m" + " - "
@@ -341,15 +351,15 @@ public class PlayState extends GameState {
 	private void drawCamera() {
 		g.drawMode(g.DRAW_SCREEN);
 
-		Terrain.render(g, sub, bounds, currentState);
+		Terrain.render(g, sub, bounds, getCurrentState());
 
 		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 				new Color(255, 255, 255, sub.getDistance("UP")));
 
-		if (currentState == 0) {
+		if (getCurrentState() == 0) {
 			g.drawImage(Assets.bubbleUpAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
-		} else if (currentState == 1) {
+		} else if (getCurrentState() == 1) {
 			g.drawImage(Assets.bubbleDownAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
 		} else {
@@ -366,24 +376,50 @@ public class PlayState extends GameState {
 	
 	private void drawWindowEvent(Graphics g) {
 		
-		int event = events.get(currentState);
+		int event = events.get(getCurrentState());
 		
 		if(event == 1) {
 			g.drawImage(Assets.leechAnim.getTexture(), new Vector2f(0, 0), new Vector2f(50), new Vector2f(0),
-					new Color(255, 255, 255, 1));
+					new Color(255, 255, 255, eventAlpha[getCurrentState()]));
 		}
 	}
 	
 	public static int eventOpenWindow(int event) {
 		List<Integer> open = new ArrayList<Integer>();
 		for(int i = 0; i < 3; i++) {
-			if(events.get(i) == 0) {
+			if(events.get(i) == 0 && nextEvents.get(i) == 0) {
 				open.add(i);
 			}
 		}
 		int selection = rand.nextInt(open.size());
-		events.replace(selection, event);
+		nextEvents.replace(selection, event);
 		return selection;
+	}
+	
+	public static void resetEvent(int returnEvent) {
+		nextEvents.replace(returnEvent, 0);
+	}
+	
+	private void phaseEvents() {
+		for(int i = 0; i < 3; i++) {
+			if(events.get(i) != nextEvents.get(i)) {
+				if(eventIn[i]) {
+					eventAlpha[i]+= 0.01f;
+					if(eventAlpha[i] > 1) {
+						eventAlpha[i] = 1;
+						eventIn[i] = false;
+						events.replace(i, nextEvents.get(i));
+					}
+				}else {
+					eventAlpha[i]-= 0.01f;
+					if(eventAlpha[i] < 0) {
+						eventAlpha[i] = 0;
+						eventIn[i] = true;
+						events.replace(i, nextEvents.get(i));
+					}
+				}
+			}
+		}
 	}
 
 	private void drawStation() {
@@ -404,8 +440,8 @@ public class PlayState extends GameState {
 	}
 
 	public void setState(int state) {
-		this.previousState = this.currentState;
-		this.currentState = state;
+		this.previousState = getCurrentState();
+		PlayState.currentState = state;
 	}
 
 	private void fadeAllSources() {
@@ -433,5 +469,9 @@ public class PlayState extends GameState {
 		for(Leech l : leeches) {
 			l.resumeSFX();
 		}
+	}
+
+	public static int getCurrentState() {
+		return currentState;
 	}
 }

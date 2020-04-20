@@ -30,6 +30,8 @@ public class Leech {
 	
 	private int returnEvent;
 	
+	public boolean dead = false;
+	
 	public Leech(Submarine sub) {
 		this.sub = sub;
 		
@@ -75,8 +77,8 @@ public class Leech {
 				sfx.play(Assets.windowbreaking);
 			}
 			
-			if(sub.isLights()) {
-				health -= 10f;
+			if(sub.isLights() && PlayState.getCurrentState() == returnEvent) {
+				health -= 1f;
 			}
 			
 			if(health == 0) {
@@ -88,7 +90,12 @@ public class Leech {
 			sub.setOxygen(sub.getOxygen() - 0.03f);
 			this.position = sub.getPosition();
 		}else {
-			
+			PlayState.resetEvent(returnEvent);
+			this.target = new Vector2f((float) (50 * Math.cos(theta)), (float) (50 * Math.sin(theta)));
+			position.lerp(new Vector2f(target), 0.007f);
+			if(getRadialDistance() > 40) {
+				dead = true;
+			}
 		}
 	}
 	
@@ -108,13 +115,15 @@ public class Leech {
 		
 		this.position = new Vector2f((float) (target.x + (dis * Math.cos(theta))),
 				(float) (target.y + dis * Math.sin(theta)));
+		
+		System.out.println(getRadialDistance());
 	}
 	
 	public void render(Graphics g, float sonarRadius, float alpha) {
-//		if(getRadialDistance() < sonarRadius) {
+		if(getRadialDistance() < sonarRadius) {
 			g.drawImage(Assets.sonarDot, position.sub(sub.getPosition(), new Vector2f()).mul(2), new Vector2f(8),
-					new Vector2f(0), new Color(150, 0, 0, 1));
-//		}
+					new Vector2f(0), new Color(150, 0, 0, alpha));
+		}
 	}
 	
 	private float getRadialDistance() {
