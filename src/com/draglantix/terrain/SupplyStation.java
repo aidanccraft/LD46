@@ -1,12 +1,14 @@
 package com.draglantix.terrain;
 
 import org.joml.Vector2f;
+import org.lwjgl.glfw.GLFW;
 
 import com.draglantix.entities.Submarine;
 import com.draglantix.flare.collision.AABB;
 import com.draglantix.flare.collision.AABBCollider;
 import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
+import com.draglantix.flare.window.Window;
 import com.draglantix.main.Assets;
 import com.draglantix.states.PlayState;
 
@@ -18,8 +20,16 @@ public class SupplyStation {
 	private int stationType;
 	private boolean visited = false;
 	private boolean isColliding = false;
-	private String message;
-	private String exitMessage = "Press Space to exit";
+	private int biome;
+	
+	private String[] logList;
+	
+	private String bottomMessage1 = "Press D for next log";
+	private String bottomMessage2 = "Press A or D for logs";
+	private String bottomMessage3 = "Press Space to exit";
+	private String bottomMessage = bottomMessage1;
+	
+	private int currentScreen = 0;
 
 	public SupplyStation(Vector2f position, int stationType) {
 		this.position = position;
@@ -62,21 +72,47 @@ public class SupplyStation {
 			this.isColliding = false;
 		}
 	}
+	
+	public void tick() {
+		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_A)) {
+			currentScreen--;
+		} else if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_D)) {
+			currentScreen++;
+		}
+		
+		bottomMessage = bottomMessage2;
+		
+		if(currentScreen <= 0) {
+			currentScreen = 0;
+			bottomMessage = bottomMessage1;
+		} else if(currentScreen >= logList.length) {
+			currentScreen = logList.length;
+			bottomMessage = bottomMessage3;
+		}
+	}
 
 	public void render(Graphics g, Vector2f subPos, float alpha) {
 		g.drawImage(Assets.blank, position.sub(subPos, new Vector2f()).mul(2), scale.mul(2, new Vector2f()),
 				new Vector2f(0), new Color(this.r, this.g, this.b, alpha));
 	}
 	
-	public void renderText(Graphics g) {
-		g.drawString(Assets.font, this.message, new Vector2f(-44, 40), new Vector2f(4), new Color(200, 174, 146, 1),
-				88, g.FONT_LEFT);
-		g.drawString(Assets.font, this.exitMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
-				g.FONT_LEFT);
+	public void renderScreen(Graphics g, PlayState state) {
+		if(currentScreen != logList.length) {
+			g.drawString(Assets.font, this.logList[currentScreen], new Vector2f(-44, 40), new Vector2f(4), new Color(200, 174, 146, 1),
+					88, g.FONT_LEFT);
+			g.drawString(Assets.font, this.bottomMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
+					g.FONT_LEFT);
+		} else {
+			g.drawString(Assets.font, "Map of " + state.getBiome(biome), new Vector2f(0, 40), new Vector2f(4), new Color(200, 174, 146, 1),
+					88, g.FONT_CENTER);
+			g.drawString(Assets.font, this.bottomMessage, new Vector2f(-44, -40), new Vector2f(4), new Color(200, 174, 146, 1),
+					g.FONT_LEFT);
+		}
 	}
 	
-	public void setMessage(String message) {
-		this.message = message;
+	public void setLogs(String logs) {
+		this.logList = logs.split("\n- ");
+		this.logList[0] = this.logList[0].substring(4);
 	}
 
 	public Vector2f getPosition() {
@@ -117,6 +153,14 @@ public class SupplyStation {
 
 	public void setVisited(boolean visited) {
 		this.visited = visited;
+	}
+
+	public int getBiome() {
+		return biome;
+	}
+
+	public void setBiome(int biome) {
+		this.biome = biome;
 	}
 
 }

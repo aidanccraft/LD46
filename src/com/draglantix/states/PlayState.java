@@ -166,6 +166,8 @@ public class PlayState extends GameState {
 				gsm.setState(States.GAMEOVER);
 			}
 		} else {
+			StationHandler.tick();
+			
 			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
 				PlayState.currentState = this.previousState;
 				resumeAllSources();
@@ -424,7 +426,7 @@ public class PlayState extends GameState {
 
 	private void drawStation() {
 		g.drawMode(g.DRAW_SCREEN);
-		StationHandler.renderText(g);
+		StationHandler.renderText(g, this);
 	}
 
 	public Submarine getSub() {
@@ -466,6 +468,13 @@ public class PlayState extends GameState {
 
 		Assets.submarineSFX1.setLooping(true);
 		Assets.submarineSFX1.play(Assets.subengine);
+
+		Assets.submarineSFX0.setVolume(1);
+		Assets.submarineSFX1.setVolume(1);
+		Assets.submarineSFX2.setVolume(1);
+		Assets.submarineSFX3.setVolume(1);
+		Assets.sonarSFX.setVolume(1);
+		Assets.submarineEngine.setVolume(1);
 		for(Leech l : leeches) {
 			l.resumeSFX();
 		}
@@ -473,5 +482,9 @@ public class PlayState extends GameState {
 
 	public static int getCurrentState() {
 		return currentState;
+	}
+	
+	public String getBiome(int biome) {
+		return biomes.get(biome);
 	}
 }
