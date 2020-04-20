@@ -37,40 +37,34 @@ public class PlayState extends GameState {
 
 	private Vector3f ambientDir = new Vector3f(1, 0, 0);
 
-	private float sonarScale = 0;
-	private float maxSonarScale = 80;
+	private float sonarScale, maxSonarScale;
 
 	private int[][] map;
 
-	private Map<Integer, String> states = new HashMap<Integer, String>();
+	private Map<Integer, String> states, biomes;
 
-	private static Map<Integer, Integer> events = new HashMap<Integer, Integer>();
-	private static Map<Integer, Integer> nextEvents = new HashMap<Integer, Integer>();
-	private float[] eventAlpha = new float[] {0f, 0f, 0f, 0f};
-	private boolean[] eventIn = new boolean[] {true, true, true, true};
-	
+	private static Map<Integer, Integer> events, nextEvents;
+	private float[] eventAlpha;
+	private boolean[] eventIn;
+
 	private static int currentState;
 
-	private int previousState;
-	private int switchableStates = 4;
+	private int previousState, switchableStates;
 
-	private Map<Integer, String> biomes = new HashMap<Integer, String>();
-
-	public static List<AABB> bounds = new ArrayList<AABB>();
-	private List<AABB> sonarBounds = new ArrayList<AABB>();
-	private List<SupplyStation> sonarStations = new ArrayList<SupplyStation>();
-
-	private List<SeaMonster> sea_monsters = new ArrayList<SeaMonster>();
+	public static List<AABB> bounds;
+	private List<AABB> sonarBounds;
+	private List<SupplyStation> sonarStations;
+	private List<SeaMonster> sea_monsters;
 
 	private QuadTree qt;
-	
+
 	private Timer spawnTimer;
-	private double spawnDelta = 0f;
+	private double spawnDelta;
 
 	private float lastWindowHeight;
-	
-	private static boolean miniMenu, endGame = false, gameFinishing = false;
-	
+
+	private static boolean miniMenu, endGame, gameFinishing;
+
 	private int miniMenuSelection;
 
 	public PlayState(Graphics g, GameStateManager gsm) {
@@ -78,15 +72,41 @@ public class PlayState extends GameState {
 	}
 
 	public void init() {
-		
+		sonarScale = 0;
+		maxSonarScale = 80;
+
+		states = new HashMap<Integer, String>();
+
+		previousState = 0;
+
+		events = new HashMap<Integer, Integer>();
+		nextEvents = new HashMap<Integer, Integer>();
+		eventAlpha = new float[] { 0f, 0f, 0f, 0f, 0f };
+		eventIn = new boolean[] { true, true, true, true, true };
+
+		switchableStates = 4;
+
+		biomes = new HashMap<Integer, String>();
+
+		bounds = new ArrayList<AABB>();
+		sonarBounds = new ArrayList<AABB>();
+		sonarStations = new ArrayList<SupplyStation>();
+
+		sea_monsters = new ArrayList<SeaMonster>();
+
+		spawnDelta = 0f;
+
+		endGame = false;
+		gameFinishing = false;
+
 		resumeAllSources();
-		
+
 		miniMenu = false;
 		endGame = false;
-		
+
 		miniMenuSelection = 0;
-		
-		sub = new Submarine(new Vector2f(623, -598), .2f);//new Vector2f(33, -10), 0.2f);
+
+		sub = new Submarine(new Vector2f(623, -598), .2f);// new Vector2f(33, -10), 0.2f);
 		currentState = 0;
 
 		states.put(0, "WINDOW DOWN");
@@ -96,15 +116,17 @@ public class PlayState extends GameState {
 		states.put(4, "SONAR");
 		states.put(5, "STATION");
 
-		events.put(0, 0); //Window, Event
+		events.put(0, 0); // Window, Event
 		events.put(1, 0);
 		events.put(2, 0);
 		events.put(3, 0);
-		
-		nextEvents.put(0, 0); //Window, Event
+		events.put(4, 0);
+
+		nextEvents.put(0, 0); // Window, Event
 		nextEvents.put(1, 0);
 		nextEvents.put(2, 0);
 		nextEvents.put(3, 0);
+		nextEvents.put(4, 0);
 
 		biomes.put(0, "...");
 		biomes.put(1, "Shallows");
@@ -125,7 +147,7 @@ public class PlayState extends GameState {
 				}
 			}
 		}
-		
+
 		StationHandler.init();
 
 		Assets.submarineSFX0.setLooping(true);
@@ -133,13 +155,13 @@ public class PlayState extends GameState {
 
 		Assets.submarineSFX1.setLooping(true);
 		Assets.submarineSFX1.play(Assets.subengine);
-		
+
 		spawnTimer = new Timer();
-		
+
 		lastWindowHeight = 600f;
-		
-		if(Window.getHeight() != lastWindowHeight) {
-			float winScale = Window.getHeight()/lastWindowHeight;
+
+		if (Window.getHeight() != lastWindowHeight) {
+			float winScale = Window.getHeight() / lastWindowHeight;
 			g.setScale(g.getScale() * winScale);
 			lastWindowHeight = Window.getHeight();
 		}
@@ -148,66 +170,69 @@ public class PlayState extends GameState {
 	public void respawn() {
 		if (StationHandler.getRespawn() != null) {
 			sub = new Submarine(new Vector2f(StationHandler.getRespawn().getPosition()), 0.2f);
+			previousState = 0;
+			resumeAllSources();
 		} else {
-			sub = new Submarine(new Vector2f(33, -10), 0.2f);
+			init();
 		}
 		currentState = 0;
 	}
 
 	@Override
 	public void tick() {
-		
-		if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
-			if(miniMenu) {
+
+		if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ESCAPE)) {
+			if (miniMenu) {
 				resumeAllSources();
 				miniMenu = false;
-			}else {
+			} else {
 				fadeAllSources();
 				miniMenu = true;
 			}
-			
+
 			miniMenuSelection = 0;
 		}
-		
-		if(miniMenu) {
-			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_S) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_DOWN)) {
-				miniMenuSelection ++;
+
+		if (miniMenu) {
+			if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_S) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_DOWN)) {
+				miniMenuSelection++;
 			}
-			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_W) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_UP)) {
-				miniMenuSelection --;
+			if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_W) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_UP)) {
+				miniMenuSelection--;
 			}
-			
-			if(miniMenuSelection > 2) {
+
+			if (miniMenuSelection > 2) {
 				miniMenuSelection = 0;
 			}
-			
-			if(miniMenuSelection < 0) {
+
+			if (miniMenuSelection < 0) {
 				miniMenuSelection = 2;
 			}
-			
-			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE) || Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
-				switch(miniMenuSelection) {
-					
-					case 0:
-						miniMenu = false;
-						break;
-					case 1:
-						gsm.setState(States.MENU);
-						break;
-					case 2:
-						Window.close();
-						break;
-					default:
-						break;
-				
+
+			if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)
+					|| Window.getInput().isKeyPressed(GLFW.GLFW_KEY_ENTER)) {
+				switch (miniMenuSelection) {
+
+				case 0:
+					miniMenu = false;
+					break;
+				case 1:
+					gsm.setState(States.MENU);
+					break;
+				case 2:
+					Window.close();
+					break;
+				default:
+					break;
+
 				}
 			}
-			
-			return;	
+
+			return;
 		}
 
 		handleAudio();
-		
+
 		handleSubstates();
 
 		if (getCurrentState() != switchableStates + 1) {
@@ -229,7 +254,7 @@ public class PlayState extends GameState {
 						this.sonarBounds.add(t);
 					}
 				}
-				
+
 				this.sonarStations = StationHandler.checkSonar(sub, sonarScale / maxSonarScale, sonarStations);
 
 			} else {
@@ -238,8 +263,10 @@ public class PlayState extends GameState {
 			}
 
 			handleCreatures();
-			
-			StationHandler.checkCollisions(sub, this);
+
+			if (!endGame) {
+				StationHandler.checkCollisions(sub, this);
+			}
 
 			if (!sub.isAlive()) {
 				fadeAllSources();
@@ -248,13 +275,13 @@ public class PlayState extends GameState {
 			}
 		} else {
 			StationHandler.tick();
-			
-			if(Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
+
+			if (Window.getInput().isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
 				PlayState.currentState = this.previousState;
 				resumeAllSources();
 			}
 		}
-		
+
 		phaseEvents();
 
 		spawnDelta += spawnTimer.getDelta();
@@ -262,20 +289,23 @@ public class PlayState extends GameState {
 
 	@Override
 	public void render() {
-		
-		if(Window.hasResized()) {
-			float winScale = Window.getHeight()/lastWindowHeight;
-			g.setScale(g.getScale() * winScale);
-			lastWindowHeight = Window.getHeight();
+
+		if (Window.hasResized()) {
+			if (Window.getHeight() != 0) {
+				float winScale = Window.getHeight() / lastWindowHeight;
+				g.setScale(g.getScale() * winScale);
+				lastWindowHeight = Window.getHeight();
+			}
 		}
-		
+
 		g.drawMode(g.DRAW_SCREEN);
-		
-		g.drawImage(Assets.blank, new Vector2f(0, 0), new Vector2f(Window.getWidth()/g.getScale(), Window.getHeight()/g.getScale()),
-				new Vector2f(0), new Color(100, 85, 76, 1));
+
+		g.drawImage(Assets.blank, new Vector2f(0, 0),
+				new Vector2f(Window.getWidth() / g.getScale(), Window.getHeight() / g.getScale()), new Vector2f(0),
+				new Color(100, 85, 76, 1));
 		g.drawImage(Assets.panel, new Vector2f(0, 0), new Vector2f(128f), new Vector2f(0), new Color(255, 255, 255, 1));
 		g.drawImage(Assets.screen, new Vector2f(0, 0), new Vector2f(92f), new Vector2f(0), new Color(255, 255, 255, 1));
-		
+
 		if (getCurrentState() < 4) {
 			drawCamera();
 		} else if (getCurrentState() == 5) {
@@ -285,19 +315,27 @@ public class PlayState extends GameState {
 		}
 
 		drawStats();
-		
-		g.drawImage(Assets.dark1, new Vector2f(0, 0), new Vector2f(Window.getWidth() / g.getScale() / 0.7f, Window.getHeight() / g.getScale() / 0.7f), new Vector2f(0), new Color(100, 85, 76, 1));
 
-		if(miniMenu) {
-			g.drawImage(Assets.screen, new Vector2f(0), new Vector2f(100, 64), new Vector2f(0), new Color(255, 255, 255, 1));
-			
-			g.drawString(Assets.font, "Paused", new Vector2f(0, 25), new Vector2f(6), new Color(200, 174, 146, 1), g.FONT_CENTER);
-			
-			g.drawString(Assets.font, "Resume", new Vector2f(-20, 10), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_LEFT);
-			g.drawString(Assets.font, "Quit to Menu", new Vector2f(-20, 0), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_LEFT);
-			g.drawString(Assets.font, "Quit", new Vector2f(-20, -10), new Vector2f(4), new Color(200, 174, 146, 1), g.FONT_LEFT);
-			
-			g.drawImage(Assets.selector, new Vector2f(-30, 10 - (miniMenuSelection * 10)), new Vector2f(4), new Vector2f(0), new Color(200, 174, 146, 1));
+		g.drawImage(Assets.dark1, new Vector2f(0, 0),
+				new Vector2f(Window.getWidth() / g.getScale() / 0.7f, Window.getHeight() / g.getScale() / 0.7f),
+				new Vector2f(0), new Color(100, 85, 76, 1));
+
+		if (miniMenu) {
+			g.drawImage(Assets.screen, new Vector2f(0), new Vector2f(100, 64), new Vector2f(0),
+					new Color(255, 255, 255, 1));
+
+			g.drawString(Assets.font, "Paused", new Vector2f(0, 25), new Vector2f(6), new Color(200, 174, 146, 1),
+					g.FONT_CENTER);
+
+			g.drawString(Assets.font, "Resume", new Vector2f(-20, 10), new Vector2f(4), new Color(200, 174, 146, 1),
+					g.FONT_LEFT);
+			g.drawString(Assets.font, "Quit to Menu", new Vector2f(-20, 0), new Vector2f(4),
+					new Color(200, 174, 146, 1), g.FONT_LEFT);
+			g.drawString(Assets.font, "Quit", new Vector2f(-20, -10), new Vector2f(4), new Color(200, 174, 146, 1),
+					g.FONT_LEFT);
+
+			g.drawImage(Assets.selector, new Vector2f(-30, 10 - (miniMenuSelection * 10)), new Vector2f(4),
+					new Vector2f(0), new Color(200, 174, 146, 1));
 		}
 	}
 
@@ -323,7 +361,7 @@ public class PlayState extends GameState {
 			Assets.music.setVolume(0);
 		}
 
-		if(getCurrentState() != 5) {
+		if (getCurrentState() != 5) {
 			if (sonarScale == 0) {
 				Assets.sonarSFX.play(Assets.sonarPing);
 			}
@@ -352,29 +390,29 @@ public class PlayState extends GameState {
 	}
 
 	private void handleCreatures() {
-		
-		if(!endGame && spawnDelta > 5 && sea_monsters.size() < 4) {
-			if(rand.nextInt(10) == 0) {
-				if(getBiome() == "Caves" || getBiome() == "Deep Caves") {
+
+		if (!endGame && spawnDelta > 5 && sea_monsters.size() < 4) {
+			if (rand.nextInt(10) == 0) {
+				if (getBiome() == "Caves" || getBiome() == "Deep Caves") {
 					sea_monsters.add(new Leech(sub));
-				}else if(getBiome() == "Open Ocean" || getBiome() == "Abyssal Zone") {
+				} else if (getBiome() == "Open Ocean" || getBiome() == "Abyssal Zone") {
 					sea_monsters.add(new Squid(sub));
 				}
 			}
 			spawnDelta = 0;
-		}else if(endGame) {
-			if(!gameFinishing) {
+		} else if (endGame) {
+			if (!gameFinishing) {
 				sea_monsters.removeAll(sea_monsters);
 				sea_monsters.add(new Leader(sub));
 				StationHandler.resetRespawn();
 				gameFinishing = true;
 			}
 		}
-		
+
 		for (int i = 0; i < sea_monsters.size(); i++) {
 			SeaMonster m = sea_monsters.get(i);
 			m.tick();
-			if(m.isDead()) {
+			if (m.isDead()) {
 				sea_monsters.remove(m);
 			}
 		}
@@ -430,9 +468,8 @@ public class PlayState extends GameState {
 
 		g.drawString(Assets.font, states.get(getCurrentState()), new Vector2f(0, 64), new Vector2f(6),
 				new Color(200, 174, 146, 1), g.FONT_CENTER);
-		g.drawString(Assets.font,
-				(int) sub.getDepth() + " m" + " - " + getBiome(),
-				new Vector2f(0, -64), new Vector2f(6), new Color(200, 174, 146, 1), g.FONT_CENTER);
+		g.drawString(Assets.font, (int) sub.getDepth() + " m" + " - " + getBiome(), new Vector2f(0, -64),
+				new Vector2f(6), new Color(200, 174, 146, 1), g.FONT_CENTER);
 	}
 
 	private void drawSonar() {
@@ -470,8 +507,17 @@ public class PlayState extends GameState {
 
 		Terrain.render(g, sub, bounds, getCurrentState());
 
+		float alpha1, alpha2;
+		
+		if(endGame) {
+			alpha1 = 1;
+			alpha2 = 1;
+		} else {
+			alpha1 = sub.getDistance("UP");
+			alpha2 = sub.calculateLight();
+		}
 		g.drawImage(Assets.water, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-				new Color(255, 255, 255, sub.getDistance("UP")));
+				new Color(255, 255, 255, alpha1));
 
 		if (getCurrentState() == 0) {
 			g.drawImage(Assets.bubbleUpAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
@@ -483,31 +529,34 @@ public class PlayState extends GameState {
 			g.drawImage(Assets.bubbleAnim.getTexture(), new Vector2f(0, -2), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, 0.5f));
 		}
-		
+
 		drawWindowEvent(g);
-		
+
 		g.drawImage(sub.isLights() ? Assets.dark1 : Assets.dark0, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
-				new Color(255, 255, 255, sub.calculateLight()));
+				new Color(255, 255, 255, alpha2));
 		g.drawImage(Assets.lens, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0), new Color(255, 255, 255, 1));
 	}
-	
+
 	private void drawWindowEvent(Graphics g) {
-		
+
 		int event = events.get(getCurrentState());
-		
-		if(event == 1) {
+
+		if (event == 1) {
 			g.drawImage(Assets.leechAnim.getTexture(), new Vector2f(0, 0), new Vector2f(50), new Vector2f(0),
 					new Color(255, 255, 255, eventAlpha[getCurrentState()]));
-		}else if(event == 2) {
+		} else if (event == 2) {
 			g.drawImage(Assets.squidAnim.getTexture(), new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
+					new Color(255, 255, 255, eventAlpha[getCurrentState()]));
+		} else if (event == 4) {
+			g.drawImage(Assets.eye, new Vector2f(0, 0), new Vector2f(64), new Vector2f(0),
 					new Color(255, 255, 255, eventAlpha[getCurrentState()]));
 		}
 	}
-	
+
 	public static int eventOpenWindow(int event) {
 		List<Integer> open = new ArrayList<Integer>();
-		for(int i = 0; i < 3; i++) {
-			if(events.get(i) == 0 && nextEvents.get(i) == 0) {
+		for (int i = 0; i < 3; i++) {
+			if (events.get(i) == 0 && nextEvents.get(i) == 0) {
 				open.add(i);
 			}
 		}
@@ -515,24 +564,24 @@ public class PlayState extends GameState {
 		nextEvents.replace(selection, event);
 		return selection;
 	}
-	
+
 	public static void resetEvent(int returnEvent) {
 		nextEvents.replace(returnEvent, 0);
 	}
-	
+
 	private void phaseEvents() {
-		for(int i = 0; i < 3; i++) {
-			if(events.get(i) != nextEvents.get(i)) {
-				if(eventIn[i]) {
-					eventAlpha[i]+= 0.1f;
-					if(eventAlpha[i] > 1) {
+		for (int i = 0; i < 4; i++) {
+			if (events.get(i) != nextEvents.get(i)) {
+				if (eventIn[i]) {
+					eventAlpha[i] += 0.1f;
+					if (eventAlpha[i] > 1) {
 						eventAlpha[i] = 1;
 						eventIn[i] = false;
 						events.replace(i, nextEvents.get(i));
 					}
-				}else {
-					eventAlpha[i]-= 0.01f;
-					if(eventAlpha[i] < 0) {
+				} else {
+					eventAlpha[i] -= 0.01f;
+					if (eventAlpha[i] < 0) {
 						eventAlpha[i] = 0;
 						eventIn[i] = true;
 						events.replace(i, nextEvents.get(i));
@@ -579,7 +628,7 @@ public class PlayState extends GameState {
 
 		Assets.music.setVolume(1);
 	}
-	
+
 	private void resumeAllSources() {
 		Assets.submarineSFX0.setLooping(true);
 		Assets.submarineSFX0.play(Assets.waterambient);
@@ -601,11 +650,11 @@ public class PlayState extends GameState {
 	public static int getCurrentState() {
 		return currentState;
 	}
-	
+
 	private String getBiome() {
 		return biomes.get(map[(int) sub.getPosition().x][-1 * (int) sub.getPosition().y]);
 	}
-	
+
 	public String getBiome(int biome) {
 		return biomes.get(biome);
 	}

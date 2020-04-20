@@ -26,7 +26,7 @@ public class Leader extends SeaMonster{
 				sfx0.setPosition3D(new Vector3f(0));
 				sfx0.play(Assets.collisionSFX);
 				sfx1.play(Assets.alarm);
-				returnEvent = PlayState.eventOpenWindow(1);
+				returnEvent = PlayState.eventOpenWindow(4);
 			}
 		}else if(behaviorState == 1) {// Attacking
 			if(!sfx0.isPlaying()) {

@@ -46,6 +46,7 @@ public class Assets {
 	public static Animation leechAnim;
 	public static SpriteSheet squid;
 	public static Animation squidAnim;
+	public static Texture eye;
 	
 	public static Texture minMap0, minMap1, minMap2, minMap3, minMap4;
 	
@@ -110,6 +111,8 @@ public class Assets {
 	
 		squid = new SpriteSheet("textures/squid.png");
 		squidAnim = new Animation(2, 2, 64, 7, squid, 0, 2, true);
+		
+		eye = new Texture("textures/eye.png");
 		
 		minMap0 = new Texture("textures/minMap/minMap0.png");
 		minMap1 = new Texture("textures/minMap/minMap1.png");
