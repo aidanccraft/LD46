@@ -96,8 +96,6 @@ public class Submarine {
 					Vector2f force = AABBCollider.correct(this.bounds, other);
 					this.bounds.getCenter().add(force);
 
-					System.out.println(this.velocity.length());
-
 					if (Math.abs(force.x) > 0) {
 						this.velocity.x = -this.velocity.x;
 					}

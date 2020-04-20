@@ -126,5 +126,8 @@ public class Leech {
 		sfx1.setVolume(value);
 	}
 	
-	
+	public void resumeSFX() {
+		sfx.setVolume(1);
+		sfx1.setVolume(1);
+	}
 }

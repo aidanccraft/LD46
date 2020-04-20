@@ -10,6 +10,7 @@ import com.draglantix.flare.textures.Animation;
 import com.draglantix.flare.textures.Font;
 import com.draglantix.flare.textures.SpriteSheet;
 import com.draglantix.flare.textures.Texture;
+import com.draglantix.flare.util.Reader;
 
 public class Assets {
 
@@ -49,6 +50,8 @@ public class Assets {
 	public static Source music;
 	
 	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineSFX3, submarineEngine, sonarSFX;
+	
+	public static String stationText;
 	
 	public static int abyssal;
 	
@@ -132,5 +135,6 @@ public class Assets {
 		alarm = AudioMaster.loadSound("sfx/alarm.wav");
 		leechHunting = AudioMaster.loadSound("sfx/leechHunting.wav");
 		
+		stationText = Reader.loadFileAsString("text/stationText.txt");
 	}
 }

@@ -8,6 +8,7 @@ import com.draglantix.flare.collision.AABBCollider;
 import com.draglantix.flare.graphics.Graphics;
 import com.draglantix.flare.util.Color;
 import com.draglantix.main.Assets;
+import com.draglantix.states.PlayState;
 
 public class SupplyStation {
 
@@ -16,6 +17,9 @@ public class SupplyStation {
 	private int r, g, b;
 	private int stationType;
 	private boolean visited = false;
+	private boolean isColliding = false;
+	private String message;
+	private String exitMessage = "Press Space to exit";
 
 	public SupplyStation(Vector2f position, int stationType) {
 		this.position = position;
@@ -41,19 +45,38 @@ public class SupplyStation {
 		sub.setPower(sub.getPower() + .1f);
 	}
 
-	public void checkCollision(Submarine sub) {
+	public void checkCollision(Submarine sub, PlayState state) {
 		if (AABBCollider.collide(this.bounds, sub.bounds)) {
 			resupply(sub);
 			
 			if(this.stationType == 2) {
 				this.visited = true;
+				
+				if(!this.isColliding) {
+					state.setState(5);
+				}
+				
+				this.isColliding = true;
 			}
+		} else {
+			this.isColliding = false;
 		}
 	}
 
 	public void render(Graphics g, Vector2f subPos, float alpha) {
 		g.drawImage(Assets.blank, position.sub(subPos, new Vector2f()).mul(2), scale.mul(2, new Vector2f()),
 				new Vector2f(0), new Color(this.r, this.g, this.b, alpha));
+	}
+	
+	public void renderText(Graphics g) {
+		g.drawString(Assets.font, this.message, new Vector2f(0, 40), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+		g.drawString(Assets.font, this.exitMessage, new Vector2f(0, -40), new Vector2f(4), new Color(200, 174, 146, 1),
+				g.FONT_CENTER);
+	}
+	
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	public Vector2f getPosition() {
