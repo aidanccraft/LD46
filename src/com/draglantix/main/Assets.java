@@ -56,7 +56,7 @@ public class Assets {
 	
 	public static Source music;
 	
-	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineSFX3, submarineEngine, sonarSFX;
+	public static Source submarineSFX0, submarineSFX1, submarineSFX2, submarineSFX3, submarineEngine, sonarSFX, lightsSFX;
 	
 	public static String stationText;
 	
@@ -132,6 +132,7 @@ public class Assets {
 		submarineSFX1 = new Source(1.5f, 1000, 0);
 		submarineSFX2 = new Source(1.5f, 1000, 0);
 		submarineSFX3 = new Source(1.5f, 1000, 0);
+		lightsSFX = new Source(1.5f, 1000, 0);
 		
 		music.setPosition(new Vector2f(0, 0));
 		music.setLooping(true);
@@ -142,6 +143,9 @@ public class Assets {
 		submarineSFX1.setPosition(new Vector2f(0, 0));
 		submarineSFX2.setPosition(new Vector2f(0, 0));
 		submarineSFX3.setPosition(new Vector2f(0, 0));
+		lightsSFX.setPosition(new Vector2f(0, 0));
+		
+		lightsSFX.setVolume(.2f);
 		
 		abyssal = AudioMaster.loadSound("music/abyssal.wav");
 		

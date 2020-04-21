@@ -621,6 +621,7 @@ public class PlayState extends GameState {
 		Assets.submarineSFX3.setVolume(0);
 		Assets.sonarSFX.setVolume(0);
 		Assets.submarineEngine.setVolume(0);
+		Assets.lightsSFX.setVolume(0);
 
 		for (SeaMonster m : sea_monsters) {
 			m.fadeSFX(0);
@@ -642,6 +643,8 @@ public class PlayState extends GameState {
 		Assets.submarineSFX3.setVolume(1);
 		Assets.sonarSFX.setVolume(1);
 		Assets.submarineEngine.setVolume(1);
+		Assets.lightsSFX.setVolume(.2f);
+		
 		for (SeaMonster m : sea_monsters) {
 			m.resumeSFX();
 		}

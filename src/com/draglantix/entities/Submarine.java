@@ -14,7 +14,7 @@ public class Submarine {
 	private Vector2f position, velocity;
 	private float resistiveForce;
 
-	private boolean lights = false;
+	private boolean lights = false, lightSwitched = false;
 
 	private float integrity = 100, power = 100, oxygen = 100;
 
@@ -76,10 +76,20 @@ public class Submarine {
 			moved = true;
 		}
 		
-		if (Window.getInput().isKeyDown(GLFW.GLFW_KEY_E)) {
+		if (Window.getInput().isKeyDown(GLFW.GLFW_KEY_E) && PlayState.getCurrentState() != 4) {
 			lights = true;
+			if(!lightSwitched) {
+				Assets.lightsSFX.setLooping(true);
+				Assets.lightsSFX.play(Assets.light);
+				lightSwitched = true;
+			}
 		}else {
 			lights = false;
+			if(lightSwitched) {
+				Assets.lightsSFX.setLooping(false);
+				Assets.lightsSFX.stop();
+				lightSwitched = false;
+			}
 		}
 
 		if (moved) {
