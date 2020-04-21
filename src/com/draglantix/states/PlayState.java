@@ -391,8 +391,8 @@ public class PlayState extends GameState {
 
 	private void handleCreatures() {
 
-		if (!endGame && spawnDelta > 5 && sea_monsters.size() < 4) {
-			if (rand.nextInt(10) == 0) {
+		if (!endGame && spawnDelta > 2 && sea_monsters.size() < 4) {
+			if (rand.nextInt(1) == 0) {
 				if (getBiome() == "Caves" || getBiome() == "Deep Caves") {
 					sea_monsters.add(new Leech(sub));
 				} else if (getBiome() == "Open Ocean" || getBiome() == "Abyssal Zone") {
@@ -400,7 +400,7 @@ public class PlayState extends GameState {
 				}
 			}
 			spawnDelta = 0;
-		} else if (endGame) {
+		} else if (endGame && currentState != 5) {
 			if (!gameFinishing) {
 				sea_monsters.removeAll(sea_monsters);
 				sea_monsters.add(new Leader(sub));

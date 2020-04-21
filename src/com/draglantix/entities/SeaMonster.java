@@ -30,14 +30,18 @@ public abstract class SeaMonster {
 	
 	protected int returnEvent;
 	
+	protected int type;
+	
 	public SeaMonster(Submarine sub, int type) {
 		this.sub = sub;
+		this.type = type;
 		
 		this.theta = (float) (rand.nextFloat() * Math.PI * 2);
-		if(type == 1) {
-			this.dis = rand.nextFloat() * 1 + 30f;
+		
+		if(type == 1 || type == 2) {
+			this.dis = rand.nextFloat() * 80 + 30f;
 		} else {
-			this.dis = 0;
+			this.dis = 30;
 		}
 		
 		float phi = (float) (rand.nextFloat() * Math.PI * 2);
@@ -52,31 +56,67 @@ public abstract class SeaMonster {
 	public abstract void tick();
 	
 	public void render(Graphics g, float sonarRadius, float alpha) {
-		if(getRadialDistance() < sonarRadius) {
-			g.drawImage(Assets.sonarDot, position.sub(sub.getPosition(), new Vector2f()).mul(2), new Vector2f(8),
-					new Vector2f(0), new Color(150, 0, 0, alpha));
+		
+		if(type == 1) {
+			if(getRadialDistance() < sonarRadius) {
+				g.drawImage(Assets.sonarDot, position.sub(sub.getPosition(), new Vector2f()).mul(2), new Vector2f(5),
+						new Vector2f(0), new Color(150, 0, 0, alpha));
+			}
+		}else if(type == 2) {
+			if(getRadialDistance() < sonarRadius) {
+				g.drawImage(Assets.sonarDot, position.sub(sub.getPosition(), new Vector2f()).mul(2), new Vector2f(8),
+						new Vector2f(0), new Color(150, 0, 0, alpha));
+			}
+		}else {
+			if(getRadialDistance() < sonarRadius) {
+				g.drawImage(Assets.sonarDot, position.sub(sub.getPosition(), new Vector2f()).mul(2), new Vector2f(15),
+						new Vector2f(0), new Color(150, 0, 0, alpha));
+			}
 		}
 	}
 	
 	protected void swim() {
 		
-		theta += 0.01f;
-		if(theta > (Math.PI * 2)) {
-			theta = 0;
+		float lerpFactor;
+		
+		if(type == 1) {
+			lerpFactor = 0.007f;
+		}else if(type == 2) {
+			lerpFactor = 0.009f;
+		}else {
+			lerpFactor = 0.1f;
 		}
 		
-		if(rand.nextInt(100) < 20) {
-			if(dis > 0) {
-				dis -= 0.1f;
+		if(type == 1 || type == 2) {
+		
+			theta += 0.01f;
+			if(theta > (Math.PI * 2)) {
+				theta = 0;
 			}
-		}
+			
+			if(rand.nextInt(100) < 20) {
+				if(dis > 0) {
+					dis -= 0.1f;
+				}
+			}
+			
+			this.dis += 0.5 * Math.cos(theta * 10);
 		
-		this.dis += 0.5 * Math.cos(theta * 10);
+		}else {
+			
+			theta += 10f;
+			if(theta > (Math.PI * 2)) {
+				theta = 0;
+			}
+			
+			dis -= 1f;
+			
+		}
 		
 		this.target = new Vector2f((float) (sub.getPosition().x + (dis * Math.cos(theta))),
 				(float) (sub.getPosition().y + dis * Math.sin(theta)));
 		
-		this.position.lerp(new Vector2f(this.target), 0.007f);
+		this.position.lerp(new Vector2f(this.target), lerpFactor);
 	}
 	
 	protected float getRadialDistance() {
