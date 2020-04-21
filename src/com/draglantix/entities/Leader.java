@@ -9,9 +9,10 @@ import com.draglantix.states.PlayState;
 public class Leader extends SeaMonster{
 
 	public Leader(Submarine sub) {
-		super(sub, 2);
+		super(sub, 3);
 		
 		sfx0.play(Assets.colossalHunting);
+		sfx0.setLooping(true);
 		sfx1.setPosition(new Vector2f(0));
 		sfx1.setLooping(true);
 	}
@@ -21,19 +22,15 @@ public class Leader extends SeaMonster{
 		if(behaviorState == 0) {//Hunting
 			swim();
 			
-			if(getRadialDistance() < 3f) {
+			System.out.println(getRadialDistance());
+			
+			if(getRadialDistance() < 8f) {
 				behaviorState = 1;
 				sfx0.setPosition3D(new Vector3f(0));
-				sfx0.play(Assets.collisionSFX);
 				sfx1.play(Assets.alarm);
 				returnEvent = PlayState.eventOpenWindow(4);
 			}
 		}else if(behaviorState == 1) {// Attacking
-			if(!sfx0.isPlaying()) {
-				sfx0.setLooping(true);	
-				sfx0.play(Assets.windowbreaking);
-			}
-			
 			sub.setOxygen(sub.getOxygen() - 0.3f);
 			this.position = sub.getPosition();
 		}
