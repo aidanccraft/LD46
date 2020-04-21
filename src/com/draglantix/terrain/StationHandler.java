@@ -47,8 +47,7 @@ public class StationHandler {
 		}
 
 		closestStation = supplyStations.get(0);
-		nextStation = supplyStations.get(16);
-		respawn = supplyStations.get(15);
+		nextStation = supplyStations.get(12);
 	}
 
 	public static List<SupplyStation> checkSonar(Submarine sub, float scale, List<SupplyStation> sonarStations) {
