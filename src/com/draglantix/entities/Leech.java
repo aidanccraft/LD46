@@ -25,6 +25,7 @@ public class Leech extends SeaMonster{
 				behaviorState = 1;
 				sfx0.setPosition3D(new Vector3f(0));
 				sfx0.play(Assets.collisionSFX);
+				sfx1.setVolume(1f);
 				sfx1.play(Assets.alarm);
 				returnEvent = PlayState.eventOpenWindow(1);
 			}
