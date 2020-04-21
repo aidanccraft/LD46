@@ -106,7 +106,7 @@ public class PlayState extends GameState {
 
 		miniMenuSelection = 0;
 
-		sub = new Submarine(new Vector2f(33, -10), 0.2f);
+		sub = new Submarine(new Vector2f(794, -442), 0.2f);
 		currentState = 0;
 
 		states.put(0, "WINDOW DOWN");
