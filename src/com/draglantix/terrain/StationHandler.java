@@ -75,14 +75,15 @@ public class StationHandler {
 	}
 
 	public static void tick() {
-		respawn.tick();
+		if (respawn != null) {
+			respawn.tick();
+		}
+
 	}
 
 	public static void checkCollisions(Submarine sub, PlayState state) {
-		for (SupplyStation station : supplyStations) {
-			station.checkCollision(sub, state);
-		}
-		
+		nextStation.checkCollision(sub, state);
+
 		if (nextStation != null) {
 			if (nextStation.isVisited()) {
 				if (supplyStations.indexOf(nextStation) + 1 == supplyStations.size()) {
@@ -145,7 +146,9 @@ public class StationHandler {
 	}
 
 	public static void renderText(Graphics g, PlayState state) {
-		respawn.renderScreen(g, state);
+		if (respawn != null) {
+			respawn.renderScreen(g, state);
+		}
 	}
 
 	public static void resetRespawn() {
