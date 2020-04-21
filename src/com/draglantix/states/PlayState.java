@@ -391,8 +391,8 @@ public class PlayState extends GameState {
 
 	private void handleCreatures() {
 
-		if (!endGame && spawnDelta > 2 && sea_monsters.size() < 4) {
-			if (rand.nextInt(1) == 0) {
+		if (!endGame && spawnDelta > 5 && sea_monsters.size() < 4) {
+			if (rand.nextInt(100) == 0) {
 				if (getBiome() == "Caves" || getBiome() == "Deep Caves") {
 					sea_monsters.add(new Leech(sub));
 				} else if (getBiome() == "Open Ocean" || getBiome() == "Abyssal Zone") {
