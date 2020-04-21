@@ -20,8 +20,8 @@ public abstract class SeaMonster {
 	
 	protected int behaviorState = 0;
 	
-	protected Source sfx0 = new Source(0.4f, 500, 1000);
-	protected Source sfx1 = new Source(0.4f, 500, 1000);
+	protected Source sfx0 = new Source(1.5f, 1000, 0);
+	protected Source sfx1 = new Source(1.5f, 1000, 0);
 	
 	protected float theta, dis;
 	
@@ -46,11 +46,11 @@ public abstract class SeaMonster {
 		
 		float phi = (float) (rand.nextFloat() * Math.PI * 2);
 		
-		this.position = new Vector2f((float) (sub.getPosition().x + (dis * Math.cos(theta))),
-				(float) (sub.getPosition().y + dis * Math.sin(theta)));
+		this.position = new Vector2f((float) (dis * Math.cos(theta)),
+				(float) (dis * Math.sin(theta)));
 		this.target = new Vector2f(position);
 		
-		sfx0.setPosition3D(new Vector3f(this.position.x, this.position.y, (float)(dis * Math.cos(phi))));
+		sfx0.setPosition3D(new Vector3f(this.position.x, this.position.y, (float) (dis * Math.cos(phi))));
 	}
 	
 	public abstract void tick();
