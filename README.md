@@ -26,4 +26,4 @@ Java 8 or higher
 Patch 0.1 - Fixed a bug that caused resources to not be refilled at stations.
 
 ## About
-This game was made by <a href=https://github.com/AstrosBoy15>@AstrosBoy15</a> and <a href=https://github.com/pie-tras>@pie-tras</a> for the <a href=https://ldjam.com>46th Ludum Dare Game Jam</a>. The theme was **Keep it Alive** and participants had only 72 hours to create an entire game. We used Java and LWJGL with a basic 2D game engine that we had created prior to the Jam. The original posting of the game can be found <a href=https://ldjam.com/events/ludum-dare/46/into-the-abyss>here</a>.
+This game was made by <a href=https://github.com/AstrosBoy15>@AstrosBoy15</a> and <a href=https://github.com/pie-tras>@pie-tras</a> for the <a href=https://ldjam.com>46th Ludum Dare Game Jam</a> in April 2020. The theme was **Keep it Alive** and participants had only 72 hours to create an entire game. We used Java and LWJGL with a basic 2D game engine that we had created prior to the Jam. The original posting of the game can be found <a href=https://ldjam.com/events/ludum-dare/46/into-the-abyss>here</a>.
